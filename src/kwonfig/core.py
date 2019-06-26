@@ -22,7 +22,7 @@ from .vault import VaultVariable
 
 def import_config_module(config_variable_name):
     # type: (str) -> ModuleType
-    """Import module specified in `CONFIG_MODULE_NAME` variable."""
+    """Import the given module."""
     path = os.getenv(config_variable_name)
     if not path:
         raise exceptions.SettingsNotSpecified(
