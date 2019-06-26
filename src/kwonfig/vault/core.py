@@ -11,7 +11,7 @@ from ..utils import iscoroutine, NOT_SET
 from .synchronous import VaultBackend
 
 SEPARATOR = "__"
-SECRETS_DISABLED_VARIABLE = "KIWI_CONFIG_DISABLE_SECRETS"
+SECRETS_DISABLED_VARIABLE = "KWONFIG_DISABLE_SECRETS"
 
 
 def are_defaults_disabled():

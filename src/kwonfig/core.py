@@ -55,7 +55,7 @@ class KWonfig(object):
     dotenv_override = attr.ib(default=False, type=bool)
     # Forbids overriding with options that are not defined in the config module
     strict_override = attr.ib(default=True, type=bool)
-    config_variable_name = attr.ib(default="KIWI_CONFIG", type=str)
+    config_variable_name = attr.ib(default="KWONFIG", type=str)
     _initialized = attr.ib(type=bool, init=False, default=False)
     _dotenv_loaded = attr.ib(type=bool, init=False, default=False)
     _conf = attr.ib(init=False, default=None)

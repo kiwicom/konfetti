@@ -49,7 +49,7 @@ def test_config_module_not_exists(config, monkeypatch):
 def test_config_var_not_specified(config, monkeypatch):
     """If config is not specified, an error should occur."""
     monkeypatch.delenv(config.config_variable_name)
-    with pytest.raises(SettingsNotSpecified, match="The environment variable `KIWI_CONFIG` is not set"):
+    with pytest.raises(SettingsNotSpecified, match="The environment variable `KWONFIG` is not set"):
         config.MISSING
 
 
@@ -145,7 +145,7 @@ def test_contains_override():
 
 
 def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
-    monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
+    monkeypatch.setenv("KWONFIG", "test_app.settings.subset")
     config = KWonfig(vault_backend=VaultBackend(vault_prefix))
     assert config.asdict() == {
         "DEBUG": True,
@@ -160,7 +160,7 @@ def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
 
 
 def test_vault_override_variables(monkeypatch, vault_prefix):
-    monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
+    monkeypatch.setenv("KWONFIG", "test_app.settings.subset")
     config = KWonfig(vault_backend=VaultBackend(vault_prefix))
     assert config.vault.get_override_examples() == {
         "NESTED_SECRET": {"PATH__TO__NESTED": '{"NESTED_SECRET": {"nested": "example_value"}}'},
@@ -170,7 +170,7 @@ def test_vault_override_variables(monkeypatch, vault_prefix):
 
 
 def test_vault_override_variables_cache(monkeypatch, vault_prefix):
-    monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
+    monkeypatch.setenv("KWONFIG", "test_app.settings.subset")
     config = KWonfig(vault_backend=VaultBackend(vault_prefix))
     assert config.vault is config.vault
     assert config.vault.get_override_examples() is config.vault.get_override_examples()
