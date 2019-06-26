@@ -6,7 +6,7 @@ import sys
 import pytest
 
 import kwonfig
-from kwonfig import KiwiConfig
+from kwonfig import KWonfig
 from kwonfig.exceptions import InvalidSecretOverrideError, MissingError, SecretKeyMissing, VaultBackendMissing
 from kwonfig.utils import NOT_SET
 from kwonfig.vault import VaultBackend
@@ -44,11 +44,11 @@ def test_missing_variable(config, vault_prefix):
 
 
 def test_missing_vault_backend():
-    config = KiwiConfig()
+    config = KWonfig()
     with pytest.raises(
         VaultBackendMissing,
         match="Vault backend is not configured. "
-        "Please specify `vault_backend` option in your `KiwiConfig` initialization",
+        "Please specify `vault_backend` option in your `KWonfig` initialization",
     ):
         config.SECRET
 
@@ -68,7 +68,7 @@ def test_get_secret(path, config):
 )
 def test_get_secret_with_prefix(vault_prefix, transform):
     """Trailing and leading slashes don't matter."""
-    config = KiwiConfig(vault_backend=VaultBackend(transform(vault_prefix), try_env_first=False))
+    config = KWonfig(vault_backend=VaultBackend(transform(vault_prefix), try_env_first=False))
     assert config.get_secret("/path/to") == {"SECRET": "value", "IS_SECRET": True, "DECIMAL": "1.3"}
 
 
@@ -157,7 +157,7 @@ def test_disable_defaults(config, monkeypatch):
 
 @pytest.fixture
 def config_with_cached_vault(vault_prefix):
-    return KiwiConfig(vault_backend=VaultBackend(vault_prefix, cache_ttl=1))
+    return KWonfig(vault_backend=VaultBackend(vault_prefix, cache_ttl=1))
 
 
 SECRET_DATA = {"DECIMAL": "1.3", "IS_SECRET": True, "SECRET": "value"}

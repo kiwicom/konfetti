@@ -48,9 +48,9 @@ DATABASE_URI = vault("path/to/db")
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KiwiConfig, VaultBackend
+from kwonfig import KWonfig, VaultBackend
 
-config = KiwiConfig(vault_backend=VaultBackend("/secret/team"))
+config = KWonfig(vault_backend=VaultBackend("/secret/team"))
 ```
 
 `kwonfig` relies on `KIWI_CONFIG` environment variable to discover your settings module, in the case above:
@@ -132,9 +132,9 @@ both the environment variable and the `.env` record exists, `False` by default.
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KiwiConfig
+from kwonfig import KWonfig
 
-config = KiwiConfig(dotenv="path/to/.env", dotenv_override=False)
+config = KWonfig(dotenv="path/to/.env", dotenv_override=False)
 ```
 
 ### Vault
@@ -145,9 +145,9 @@ To use Vault as a secrets storage you need to configure the access point:
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KiwiConfig, VaultBackend
+from kwonfig import KWonfig, VaultBackend
 
-config = KiwiConfig(vault_backend=VaultBackend("your/prefix"))
+config = KWonfig(vault_backend=VaultBackend("your/prefix"))
 ```
 
 There are two Vault backends available:
@@ -220,7 +220,7 @@ DECIMAL = vault("path/to", cast=Decimal)["fee_amount"]  # stored as string
 Decimal("0.15")
 ```
 
-Sometimes you need to access to some secrets dynamically. `KiwiConfig` provides a way to do it:
+Sometimes you need to access to some secrets dynamically. `KWonfig` provides a way to do it:
 
 ```python
 >>> from app_name.settings import config
@@ -316,9 +316,9 @@ If you don't need this behavior, it could be turned off with `try_env_first=Fals
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KiwiConfig, VaultBackend
+from kwonfig import KWonfig, VaultBackend
 
-config = KiwiConfig(vault_backend=VaultBackend("your/prefix", try_env_first=False))
+config = KWonfig(vault_backend=VaultBackend("your/prefix", try_env_first=False))
 ```
 
 ##### Disabling access to secrets
@@ -340,7 +340,7 @@ RuntimeError: Access to secrets is disabled. Unset KIWI_CONFIG_DISABLE_SECRETS v
 Vault values could be cached in memory:
 
 ```python
-config = KiwiConfig(vault_backend=VaultBackend("your/prefix", cache_ttl=60))
+config = KWonfig(vault_backend=VaultBackend("your/prefix", cache_ttl=60))
 ```
 
 By default, caching is disabled.
@@ -369,7 +369,7 @@ It is usually a good idea to use a slightly different configuration for tests (d
 export KIWI_CONFIG=app_name.settings.tests
 ```
 
-It is very useful to override some config options in tests. `KiwiConfig.override` will override config options defined
+It is very useful to override some config options in tests. `KWonfig.override` will override config options defined
 in the settings module. It works as a context manager or a decorator to provide explicit setup & clean up for overridden options.
 
 ```python
@@ -466,7 +466,7 @@ NOTE. It is forbidden to create two fixtures from the same config instances.
 The environment variable name could be customized via `config_variable_name` option:
 
 ```python
-config = KiwiConfig(config_variable_name="APP_CONFIG")
+config = KWonfig(config_variable_name="APP_CONFIG")
 ```
 
 Alternatively, it is possible to specify class-based settings:

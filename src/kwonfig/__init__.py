@@ -1,4 +1,4 @@
-from .core import KiwiConfig
+from .core import KWonfig
 from .environ import EnvVariable
 from .laziness import LazyVariable
 from .vault import *
