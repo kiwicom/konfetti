@@ -1,23 +1,23 @@
-class KiwiConfigError(Exception):
+class KWonfigError(Exception):
     """Common error for all errors in `kwonfig`."""
 
 
-class MissingError(AttributeError, KiwiConfigError):
+class MissingError(AttributeError, KWonfigError):
     """Config option is missing in the given settings module."""
 
     # Should be inherited from AttributeError because tools like Celery rely
     # on this behavior
 
 
-class SettingsNotSpecified(KiwiConfigError):
+class SettingsNotSpecified(KWonfigError):
     """Environment variable, that points to a setting module is not set."""
 
 
-class SettingsNotLoadable(KiwiConfigError):
+class SettingsNotLoadable(KWonfigError):
     """Settings module is not found or can't be imported."""
 
 
-class VaultBackendMissing(KiwiConfigError):
+class VaultBackendMissing(KWonfigError):
     """A secret variable is accessed, but vault backend is not configured."""
 
 
@@ -25,9 +25,9 @@ class SecretKeyMissing(MissingError):
     """Path exists in Vault, but doesn't contain specified value."""
 
 
-class ForbiddenOverrideError(KiwiConfigError):
+class ForbiddenOverrideError(KWonfigError):
     """An attempt to override configuration with a key that doesn't exist in the configuration."""
 
 
-class InvalidSecretOverrideError(KiwiConfigError):
+class InvalidSecretOverrideError(KWonfigError):
     """Environment variable for secret override contains invalid or non-JSON data."""

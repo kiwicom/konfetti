@@ -6,7 +6,7 @@ import uuid
 import hvac
 import pytest
 
-from kwonfig.core import KiwiConfig
+from kwonfig.core import KWonfig
 from kwonfig.vault import VaultBackend
 
 pytest_plugins = ["pytester"]
@@ -30,7 +30,7 @@ def config(request, vault_prefix):
         from kwonfig.vault import AsyncVaultBackend as vault_backend
     else:
         vault_backend = VaultBackend
-    yield KiwiConfig(vault_backend=vault_backend(vault_prefix))
+    yield KWonfig(vault_backend=vault_backend(vault_prefix))
     sys.modules.pop("settings.production", None)
 
 
@@ -58,10 +58,10 @@ def settings(testdir, env, monkeypatch, vault_prefix):
     settings = testdir.mkdir("settings")
     settings.ensure("__init__.py").write(
         """
-from kwonfig import KiwiConfig
+from kwonfig import KWonfig
 from kwonfig.vault import VaultBackend
 
-config = KiwiConfig(vault_backend=VaultBackend("{}"))
+config = KWonfig(vault_backend=VaultBackend("{}"))
 """.format(
             vault_prefix
         )

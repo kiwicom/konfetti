@@ -5,7 +5,7 @@ from typing import Coroutine
 import aiohttp
 import pytest
 
-from kwonfig import env, KiwiConfig
+from kwonfig import env, KWonfig
 from kwonfig._async import make_async_callback, make_simple_coro
 from kwonfig.exceptions import MissingError, SecretKeyMissing
 from kwonfig.vault import AsyncVaultBackend
@@ -93,7 +93,7 @@ async def test_make_simple_coro():
 
 @pytest.fixture
 def config_with_cached_vault(vault_prefix):
-    return KiwiConfig(vault_backend=AsyncVaultBackend(vault_prefix, cache_ttl=1))
+    return KWonfig(vault_backend=AsyncVaultBackend(vault_prefix, cache_ttl=1))
 
 
 SECRET_DATA = {"DECIMAL": "1.3", "IS_SECRET": True, "SECRET": "value"}
@@ -135,7 +135,7 @@ async def test_no_recaching(config_with_cached_vault, mocker, freezer, vault_tok
 async def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
     # All options, including dicts should be evaluated
     monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
-    config = KiwiConfig(vault_backend=AsyncVaultBackend(vault_prefix))
+    config = KWonfig(vault_backend=AsyncVaultBackend(vault_prefix))
     assert await config.asdict() == {
         "DEBUG": True,
         "SECRET": "value",
@@ -150,7 +150,7 @@ async def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
 
 async def test_asdict_shortcut(vault_prefix, vault_addr, vault_token):
     # If there are no coroutines - nothing should be awaited
-    config = KiwiConfig(vault_backend=AsyncVaultBackend(vault_prefix))
+    config = KWonfig(vault_backend=AsyncVaultBackend(vault_prefix))
 
     class TestSettings:
         SECRET = 1

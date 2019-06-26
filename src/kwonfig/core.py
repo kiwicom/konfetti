@@ -45,7 +45,7 @@ def get_config_option_names(module):
 
 
 @attr.s(slots=True)
-class KiwiConfig(object):
+class KWonfig(object):
     """Configuration holder."""
 
     vault_backend = attr.ib(
@@ -210,7 +210,7 @@ class KiwiConfig(object):
             raise exceptions.VaultBackendMissing(
                 "Vault backend is not configured. "
                 "Please specify `vault_backend` option in "
-                "your `KiwiConfig` initialization"
+                "your `KWonfig` initialization"
             )
 
         # A closure is needed to avoid a need to evaluate VAULT_{ADDR,TOKEN} variables
@@ -259,7 +259,7 @@ class KiwiConfig(object):
 class _Vault(object):
     """A namespace holder to provide `config.vault.get_override_examples()` API."""
 
-    _config = attr.ib(type=KiwiConfig)
+    _config = attr.ib(type=KWonfig)
     _overrides = attr.ib(init=False, default=None, type=Dict[str, Dict[str, str]])
 
     def get_override_examples(self):
@@ -285,7 +285,7 @@ class OverrideContextManager:
     __slots__ = ("config", "kwargs")
 
     def __init__(self, config, **kwargs):
-        # type: (KiwiConfig, **Any) -> None
+        # type: (KWonfig, **Any) -> None
         self.config = config
         self.kwargs = kwargs
 

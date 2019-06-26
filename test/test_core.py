@@ -4,7 +4,7 @@ import sys
 from dotenv import load_dotenv
 import pytest
 
-from kwonfig.core import import_config_module, KiwiConfig
+from kwonfig.core import import_config_module, KWonfig
 from kwonfig.exceptions import MissingError, SettingsNotLoadable, SettingsNotSpecified
 from kwonfig.vault import VaultBackend
 
@@ -18,7 +18,7 @@ def test_simple_var_access(config):
 
 
 def test_forbid_setattr(config):
-    """`setattr` is forbidden for options in KiwiConfig."""
+    """`setattr` is forbidden for options in KWonfig."""
     with pytest.raises(AttributeError):
         config.KEY = "value"
 
@@ -31,7 +31,7 @@ def test_missing_variable(config):
 
 def test_no_reinitialization(mocked_import_config_module):
     """When config instance is accessed second time, the underlying module is not re-imported."""
-    config = KiwiConfig()
+    config = KWonfig()
     for _ in (1, 2):
         assert config.EXAMPLE == "test"
         # Py2.7, Py3.5: replace with `assert_called_once` when 2.7/3.5 support will be dropped.
@@ -68,7 +68,7 @@ def test_import_single_string_module(config, monkeypatch):
 
 def test_custom_config_variable_name(monkeypatch):
     # Config variable name is customizable
-    config = KiwiConfig(config_variable_name="APP_CONFIG")
+    config = KWonfig(config_variable_name="APP_CONFIG")
     monkeypatch.setenv("APP_CONFIG", "test_app.settings.production")
     assert config.KEY == "value"
 
@@ -76,21 +76,21 @@ def test_custom_config_variable_name(monkeypatch):
 @pytest.mark.usefixtures("mocked_import_config_module")
 def test_require():
     """Validate config and raise proper exception if required variables are missing."""
-    config = KiwiConfig()
+    config = KWonfig()
     with pytest.raises(MissingError, match=r"Options \['MISSING', 'YET_ANOTHER_MISSING'\] are required"):
         config.require("MISSING", "YET_ANOTHER_MISSING")
 
 
 @pytest.mark.usefixtures("mocked_import_config_module")
 def test_require_ok():
-    config = KiwiConfig()
+    config = KWonfig()
     assert config.require("EXAMPLE") is None
 
 
 @pytest.mark.usefixtures("mocked_import_config_module")
 def test_require_nothing():
     """Given keys should contain at least one element."""
-    config = KiwiConfig()
+    config = KWonfig()
     with pytest.raises(RuntimeError, match="You need to specify at least one key"):
         config.require()
 
@@ -98,7 +98,7 @@ def test_require_nothing():
 def test_dotenv(testdir):
     settings = testdir.tmpdir.ensure_dir("settings")
     settings.ensure(".env").write("FROM_DOTENV=loaded")
-    config = KiwiConfig(dotenv=os.path.join(str(settings), ".env"))
+    config = KWonfig(dotenv=os.path.join(str(settings), ".env"))
     assert config.FROM_DOTENV == "loaded"
 
 
@@ -108,7 +108,7 @@ def test_dotenv_override(testdir, monkeypatch, override, expected_value):
     settings = testdir.tmpdir.ensure_dir("settings")
     settings.ensure(".env").write("FROM_DOTENV=loaded")
     monkeypatch.setenv("FROM_DOTENV", "loaded_from_env")
-    config = KiwiConfig(dotenv=os.path.join(str(settings), ".env"), dotenv_override=override)
+    config = KWonfig(dotenv=os.path.join(str(settings), ".env"), dotenv_override=override)
     assert config.FROM_DOTENV == expected_value
 
 
@@ -116,7 +116,7 @@ def test_dotenv_reloading(testdir, mocker):
     """The dotenv file shouldn't be reloaded after first time."""
     settings = testdir.tmpdir.ensure_dir("settings")
     settings.ensure(".env").write("FROM_DOTENV=loaded")
-    config = KiwiConfig(dotenv=os.path.join(str(settings), ".env"), dotenv_override=True)
+    config = KWonfig(dotenv=os.path.join(str(settings), ".env"), dotenv_override=True)
     load_env = mocker.patch("kwonfig.core.load_dotenv", wraps=load_dotenv)
     assert config.FROM_DOTENV == "loaded"
     assert load_env.called
@@ -138,7 +138,7 @@ def test_contains_invalid(config):
 
 
 def test_contains_override():
-    config = KiwiConfig(strict_override=False)
+    config = KWonfig(strict_override=False)
     with config.override(MISSING="awesome"):
         with config.override():
             assert "MISSING" in config
@@ -146,7 +146,7 @@ def test_contains_override():
 
 def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
     monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
-    config = KiwiConfig(vault_backend=VaultBackend(vault_prefix))
+    config = KWonfig(vault_backend=VaultBackend(vault_prefix))
     assert config.asdict() == {
         "DEBUG": True,
         "SECRET": "value",
@@ -161,7 +161,7 @@ def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
 
 def test_vault_override_variables(monkeypatch, vault_prefix):
     monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
-    config = KiwiConfig(vault_backend=VaultBackend(vault_prefix))
+    config = KWonfig(vault_backend=VaultBackend(vault_prefix))
     assert config.vault.get_override_examples() == {
         "NESTED_SECRET": {"PATH__TO__NESTED": '{"NESTED_SECRET": {"nested": "example_value"}}'},
         "SECRET": {"PATH__TO": '{"SECRET": "example_value"}'},
@@ -171,6 +171,6 @@ def test_vault_override_variables(monkeypatch, vault_prefix):
 
 def test_vault_override_variables_cache(monkeypatch, vault_prefix):
     monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
-    config = KiwiConfig(vault_backend=VaultBackend(vault_prefix))
+    config = KWonfig(vault_backend=VaultBackend(vault_prefix))
     assert config.vault is config.vault
     assert config.vault.get_override_examples() is config.vault.get_override_examples()
