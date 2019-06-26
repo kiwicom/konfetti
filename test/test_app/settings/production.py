@@ -16,6 +16,13 @@ NESTED_SECRET = vault("path/to/nested")["NESTED_SECRET"]["nested"]
 SECRET_FILE = vault_file("path/to/file")["SECRET_FILE"]
 DEFAULT = vault("path/to", default="default")["DEFAULT"]
 
+
+def get_default():
+    return 42
+
+
+CALLABLE_DEFAULT = env("path/to", default=get_default)
+
 IS_SECRET = vault("path/to", cast=bool)["IS_SECRET"]
 DECIMAL = vault("path/to", cast=Decimal)["DECIMAL"]
 FLOAT_DECIMAL = vault("path/to/cast", cast=Decimal)["DECIMAL"]

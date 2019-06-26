@@ -174,3 +174,7 @@ def test_vault_override_variables_cache(monkeypatch, vault_prefix):
     config = KWonfig(vault_backend=VaultBackend(vault_prefix))
     assert config.vault is config.vault
     assert config.vault.get_override_examples() is config.vault.get_override_examples()
+
+
+def test_callable_default(config):
+    assert config.CALLABLE_DEFAULT == 42
