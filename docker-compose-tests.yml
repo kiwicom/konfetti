@@ -1,0 +1,29 @@
+# Start ignoring YAMLLintBear
+version: "3.7"
+
+services:
+  kwonfig:
+    image: kiwicom/tox
+    environment:
+      TEST_VAULT_ADDR: http://vault:8200
+      VAULT_DEV_ROOT_TOKEN_ID: 'test_root_token'
+      PYTHONDONTWRITEBYTECODE: '1'
+    depends_on:
+      - vault
+    volumes:
+      - ./:/code_original
+    command: >
+      # To prevent messing with access rights and leftover files
+      # files from mounted directory are copied to internal container folder
+      bash -c "
+        cp -r /code_original /code &&
+        cd /code/ &&
+        TOX_SKIP_ENV=coverage-report tox -p all &&
+        tox -e coverage-report"
+
+  vault:
+    image: vault:0.9.6
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: 'test_root_token'
+    cap_add:
+      - IPC_LOCK

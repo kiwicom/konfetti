@@ -1,0 +1,9 @@
+coverage<4.4  # conflicts with Sonarqube
+pytest
+pytest-asyncio; python_version >= '3.5'
+pytest-freezegun
+pytest-mock
+aiohttp; python_version >= '3.5' # optional, move to requirements
+hvac  # optional
+typing; python_version < '3.5'
+mypy
