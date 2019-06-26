@@ -46,7 +46,7 @@ def vault_token():
 
 @pytest.fixture
 def env(monkeypatch):
-    monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.production")
+    monkeypatch.setenv("KWONFIG", "test_app.settings.production")
     monkeypatch.setenv("VAULT_ADDR", VAULT_ADDR)
     monkeypatch.setenv("VAULT_TOKEN", VAULT_TOKEN)
     monkeypatch.setenv("REQUIRED", "important")

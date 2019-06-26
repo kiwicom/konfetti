@@ -74,10 +74,10 @@ def test_get_secret_with_prefix(vault_prefix, transform):
 
 @pytest.mark.parametrize("action", (lambda c: c.get_secret("path/to"), lambda c: c.SECRET))
 def test_disable_secrets(config, monkeypatch, action):
-    monkeypatch.setenv("KIWI_CONFIG_DISABLE_SECRETS", "1")
+    monkeypatch.setenv("KWONFIG_DISABLE_SECRETS", "1")
     with pytest.raises(
         RuntimeError,
-        match="Access to vault is disabled. Unset `KIWI_CONFIG_DISABLE_SECRETS` environment variable to enable it.",
+        match="Access to vault is disabled. Unset `KWONFIG_DISABLE_SECRETS` environment variable to enable it.",
     ):
         action(config)
 

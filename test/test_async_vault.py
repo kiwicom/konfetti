@@ -53,10 +53,10 @@ async def test_get_secret(config):
 @pytest.mark.parametrize("action", (lambda c: c.get_secret("path/to"), lambda c: c.SECRET))
 async def test_disable_secrets(config, monkeypatch, action):
     # This option completely disables Vault access
-    monkeypatch.setenv("KIWI_CONFIG_DISABLE_SECRETS", "1")
+    monkeypatch.setenv("KWONFIG_DISABLE_SECRETS", "1")
     with pytest.raises(
         RuntimeError,
-        match="Access to vault is disabled. Unset `KIWI_CONFIG_DISABLE_SECRETS` environment variable to enable it.",
+        match="Access to vault is disabled. Unset `KWONFIG_DISABLE_SECRETS` environment variable to enable it.",
     ):
         await action(config)
 
@@ -134,7 +134,7 @@ async def test_no_recaching(config_with_cached_vault, mocker, freezer, vault_tok
 
 async def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
     # All options, including dicts should be evaluated
-    monkeypatch.setenv("KIWI_CONFIG", "test_app.settings.subset")
+    monkeypatch.setenv("KWONFIG", "test_app.settings.subset")
     config = KWonfig(vault_backend=AsyncVaultBackend(vault_prefix))
     assert await config.asdict() == {
         "DEBUG": True,

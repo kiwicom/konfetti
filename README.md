@@ -53,9 +53,9 @@ from kwonfig import KWonfig, VaultBackend
 config = KWonfig(vault_backend=VaultBackend("/secret/team"))
 ```
 
-`kwonfig` relies on `KIWI_CONFIG` environment variable to discover your settings module, in the case above:
+`kwonfig` relies on `KWONFIG` environment variable to discover your settings module, in the case above:
 
-`export KIWI_CONFIG=app_name.settings.production`
+`export KWONFIG=app_name.settings.production`
 
 ### Usage
 
@@ -323,16 +323,16 @@ config = KWonfig(vault_backend=VaultBackend("your/prefix", try_env_first=False))
 
 ##### Disabling access to secrets
 
-If you want to forbid any access to Vault (e.g. in your tests) you can set `KIWI_CONFIG_DISABLE_SECRETS` environment
+If you want to forbid any access to Vault (e.g. in your tests) you can set `KWONFIG_DISABLE_SECRETS` environment
 variable with `1` / `on` / `true` / `yes`.
 
 ```python
 >>> import os
 >>> from app_name.settings import config
->>> os.environ["KIWI_CONFIG_DISABLE_SECRETS"] = "1"
+>>> os.environ["KWONFIG_DISABLE_SECRETS"] = "1"
 >>> config.get_secret("path/to")["key"]
 ...
-RuntimeError: Access to secrets is disabled. Unset KIWI_CONFIG_DISABLE_SECRETS variable to enable it. 
+RuntimeError: Access to secrets is disabled. Unset KWONFIG_DISABLE_SECRETS variable to enable it. 
 ```
 
 ##### Caching
@@ -366,7 +366,7 @@ def lazy_property(config):
 It is usually a good idea to use a slightly different configuration for tests (disabled tracing, sentry, etc.).
 
 ```
-export KIWI_CONFIG=app_name.settings.tests
+export KWONFIG=app_name.settings.tests
 ```
 
 It is very useful to override some config options in tests. `KWonfig.override` will override config options defined
