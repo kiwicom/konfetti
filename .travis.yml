@@ -4,17 +4,17 @@ sudo: false
 language: python
 
 matrix:
-    include:
-      - python: 2.7
-        env: TOX_ENV=py27-tests
-      - python: 3.5
-        env: TOX_ENV=py35-tests
-      - python: 3.6
-        env: TOX_ENV=py36-tests
-      - python: 3.7
-        env: TOX_ENV=py37-tests
-      - python: 3.7
-        env: TOX_ENV=pylint
+  include:
+    - python: 2.7
+      env: TOX_ENV=py27-tests
+    - python: 3.5
+      env: TOX_ENV=py35-tests
+    - python: 3.6
+      env: TOX_ENV=py36-tests
+    - python: 3.7
+      env: TOX_ENV=py37-tests
+    - python: 3.7
+      env: TOX_ENV=pylint
 
 install:
   - pip install tox
