@@ -2,6 +2,7 @@
 
 sudo: false
 language: python
+cache: pip
 
 matrix:
   include:
@@ -16,6 +17,12 @@ matrix:
     - python: 3.7
       env: TOX_ENV=pylint
 
+services:
+  - docker
+
+before_install:
+  - docker run -p 8200:8200 -d --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID=test_root_token' vault:0.9.6
+
 install:
   - pip install tox
 
@@ -24,7 +31,3 @@ script:
 
 before_cache:
   - rm -rf $HOME/.cache/pip/log
-
-cache:
-  directories:
-    - $HOME/.cache/pip
