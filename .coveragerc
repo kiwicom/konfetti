@@ -1,0 +1,13 @@
+[run]
+branch = True
+parallel = True
+source = kwonfig
+
+[paths]
+source =
+   src/kwonfig
+   .tox/*/lib/python*/site-packages/kwonfig
+
+[report]
+show_missing = True
+precision = 2
