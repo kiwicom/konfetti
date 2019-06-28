@@ -1,5 +1,6 @@
 # kwonfig
 
+![codecov](https://codecov.io/gh/kiwicom/kwonfig/branch/master/graph/badge.svg)]
 ![Build](https://img.shields.io/travis/kiwicom/kwonfig.svg)
 ![Version](https://img.shields.io/pypi/v/kwonfig.svg)
 ![Python versions](https://img.shields.io/pypi/pyversions/kwonfig.svg)
