@@ -24,10 +24,13 @@ before_install:
   - docker run -p 8200:8200 -d --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID=test_root_token' vault:0.9.6
 
 install:
-  - pip install tox
+  - pip install tox codecov
 
 script:
   - tox -e $TOX_ENV
 
 before_cache:
   - rm -rf $HOME/.cache/pip/log
+
+after_success:
+  - codecov
