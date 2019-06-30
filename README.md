@@ -1,10 +1,10 @@
 # konfetti
 
-![codecov](https://codecov.io/gh/kiwicom/konfetti/branch/master/graph/badge.svg)
-![Build](https://img.shields.io/travis/kiwicom/konfetti.svg)
-![Version](https://img.shields.io/pypi/v/konfetti.svg)
-![Python versions](https://img.shields.io/pypi/pyversions/konfetti.svg)
-![License](https://img.shields.io/pypi/l/konfetti.svg)
+[![codecov](https://codecov.io/gh/kiwicom/konfetti/branch/master/graph/badge.svg)](https://codecov.io/gh/kiwicom/konfetti)
+[![Build](https://img.shields.io/travis/kiwicom/konfetti.svg)](https://travis-ci.org/kiwicom/konfetti)
+[![Version](https://img.shields.io/pypi/v/konfetti.svg)](https://pypi.org/project/konfetti/)
+[![Python versions](https://img.shields.io/pypi/pyversions/konfetti.svg)](https://pypi.org/project/konfetti/)
+[![License](https://img.shields.io/pypi/l/konfetti.svg)](https://opensource.org/licenses/MIT)
 
 ## Description
 
