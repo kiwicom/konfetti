@@ -1,4 +1,4 @@
-# konfetti
+# :confetti_ball: konfetti :confetti_ball:
 
 [![codecov](https://codecov.io/gh/kiwicom/konfetti/branch/master/graph/badge.svg)](https://codecov.io/gh/kiwicom/konfetti)
 [![Build](https://img.shields.io/travis/kiwicom/konfetti.svg)](https://travis-ci.org/kiwicom/konfetti)
