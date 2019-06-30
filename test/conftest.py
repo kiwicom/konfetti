@@ -53,7 +53,7 @@ def env(monkeypatch):
 
 
 @pytest.fixture
-def settings(testdir, env, monkeypatch, vault_prefix):
+def settings(testdir, env, vault_prefix):
     """Setting module to test."""
     settings = testdir.mkdir("settings")
     settings.ensure("__init__.py").write(
