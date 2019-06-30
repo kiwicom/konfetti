@@ -6,8 +6,8 @@ import uuid
 import hvac
 import pytest
 
-from kwonfig.core import KWonfig
-from kwonfig.vault import VaultBackend
+from konfetti.core import Konfig
+from konfetti.vault import VaultBackend
 
 pytest_plugins = ["pytester"]
 
@@ -27,10 +27,10 @@ def vault_prefix():
 def config(request, vault_prefix):
     marker = request.node.get_closest_marker("async_vault")
     if marker:
-        from kwonfig.vault import AsyncVaultBackend as vault_backend
+        from konfetti.vault import AsyncVaultBackend as vault_backend
     else:
         vault_backend = VaultBackend
-    yield KWonfig(vault_backend=vault_backend(vault_prefix))
+    yield Konfig(vault_backend=vault_backend(vault_prefix))
     sys.modules.pop("settings.production", None)
 
 
@@ -46,7 +46,7 @@ def vault_token():
 
 @pytest.fixture
 def env(monkeypatch):
-    monkeypatch.setenv("KWONFIG", "test_app.settings.production")
+    monkeypatch.setenv("KONFETTI_SETTINGS", "test_app.settings.production")
     monkeypatch.setenv("VAULT_ADDR", VAULT_ADDR)
     monkeypatch.setenv("VAULT_TOKEN", VAULT_TOKEN)
     monkeypatch.setenv("REQUIRED", "important")
@@ -58,10 +58,10 @@ def settings(testdir, env, vault_prefix):
     settings = testdir.mkdir("settings")
     settings.ensure("__init__.py").write(
         """
-from kwonfig import KWonfig
-from kwonfig.vault import VaultBackend
+from konfetti import Konfig
+from konfetti.vault import VaultBackend
 
-config = KWonfig(vault_backend=VaultBackend("{}"))
+config = Konfig(vault_backend=VaultBackend("{}"))
 """.format(
             vault_prefix
         )
@@ -95,4 +95,4 @@ def mocked_import_config_module(mocker):
     module = ModuleType("fake")
     module.EXAMPLE = "test"
     module.SOMETHING = "else"
-    return mocker.patch("kwonfig.core.import_config_module", return_value=module)
+    return mocker.patch("konfetti.core.import_config_module", return_value=module)

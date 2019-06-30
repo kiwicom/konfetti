@@ -8,7 +8,7 @@ def test_fixtures(testdir):
         """
     import pytest
     from settings import config
-    from kwonfig.pytest_plugin import make_fixture
+    from konfetti.pytest_plugin import make_fixture
 
     make_fixture(config)
 
@@ -89,7 +89,7 @@ def test_invalid_name(testdir):
         """
     import pytest
     from settings import config
-    from kwonfig.pytest_plugin import make_fixture
+    from konfetti.pytest_plugin import make_fixture
 
     make_fixture(config, name="config")
     """

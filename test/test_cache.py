@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import pytest
 
-from kwonfig.cache import EMPTY, InMemoryCache
+from konfetti.cache import EMPTY, InMemoryCache
 
 
 @pytest.fixture

@@ -45,7 +45,7 @@ def get_config_option_names(module):
 
 
 @attr.s(slots=True)
-class KWonfig(object):
+class Konfig(object):
     """Configuration holder."""
 
     vault_backend = attr.ib(
@@ -55,7 +55,7 @@ class KWonfig(object):
     dotenv_override = attr.ib(default=False, type=bool)
     # Forbids overriding with options that are not defined in the config module
     strict_override = attr.ib(default=True, type=bool)
-    config_variable_name = attr.ib(default="KWONFIG", type=str)
+    config_variable_name = attr.ib(default="KONFETTI_SETTINGS", type=str)
     _initialized = attr.ib(type=bool, init=False, default=False)
     _dotenv_loaded = attr.ib(type=bool, init=False, default=False)
     _conf = attr.ib(init=False, default=None)
@@ -210,7 +210,7 @@ class KWonfig(object):
             raise exceptions.VaultBackendMissing(
                 "Vault backend is not configured. "
                 "Please specify `vault_backend` option in "
-                "your `KWonfig` initialization"
+                "your `Konfig` initialization"
             )
 
         # A closure is needed to avoid a need to evaluate VAULT_{ADDR,TOKEN} variables
@@ -259,7 +259,7 @@ class KWonfig(object):
 class _Vault(object):
     """A namespace holder to provide `config.vault.get_override_examples()` API."""
 
-    _config = attr.ib(type=KWonfig)
+    _config = attr.ib(type=Konfig)
     _overrides = attr.ib(init=False, default=None, type=Dict[str, Dict[str, str]])
 
     def get_override_examples(self):
@@ -285,7 +285,7 @@ class OverrideContextManager:
     __slots__ = ("config", "kwargs")
 
     def __init__(self, config, **kwargs):
-        # type: (KWonfig, **Any) -> None
+        # type: (Konfig, **Any) -> None
         self.config = config
         self.kwargs = kwargs
 

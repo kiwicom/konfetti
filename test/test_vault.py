@@ -5,12 +5,12 @@ import sys
 
 import pytest
 
-import kwonfig
-from kwonfig import KWonfig
-from kwonfig.exceptions import InvalidSecretOverrideError, MissingError, SecretKeyMissing, VaultBackendMissing
-from kwonfig.utils import NOT_SET
-from kwonfig.vault import VaultBackend
-from kwonfig.vault.core import VaultVariable
+import konfetti
+from konfetti import Konfig
+from konfetti.exceptions import InvalidSecretOverrideError, MissingError, SecretKeyMissing, VaultBackendMissing
+from konfetti.utils import NOT_SET
+from konfetti.vault import VaultBackend
+from konfetti.vault.core import VaultVariable
 
 pytestmark = [pytest.mark.usefixtures("env", "vault_data")]
 
@@ -44,11 +44,11 @@ def test_missing_variable(config, vault_prefix):
 
 
 def test_missing_vault_backend():
-    config = KWonfig()
+    config = Konfig()
     with pytest.raises(
         VaultBackendMissing,
         match="Vault backend is not configured. "
-        "Please specify `vault_backend` option in your `KWonfig` initialization",
+        "Please specify `vault_backend` option in your `Konfig` initialization",
     ):
         config.SECRET
 
@@ -68,16 +68,16 @@ def test_get_secret(path, config):
 )
 def test_get_secret_with_prefix(vault_prefix, transform):
     """Trailing and leading slashes don't matter."""
-    config = KWonfig(vault_backend=VaultBackend(transform(vault_prefix), try_env_first=False))
+    config = Konfig(vault_backend=VaultBackend(transform(vault_prefix), try_env_first=False))
     assert config.get_secret("/path/to") == {"SECRET": "value", "IS_SECRET": True, "DECIMAL": "1.3"}
 
 
 @pytest.mark.parametrize("action", (lambda c: c.get_secret("path/to"), lambda c: c.SECRET))
 def test_disable_secrets(config, monkeypatch, action):
-    monkeypatch.setenv("KWONFIG_DISABLE_SECRETS", "1")
+    monkeypatch.setenv("KONFETTI_DISABLE_SECRETS", "1")
     with pytest.raises(
         RuntimeError,
-        match="Access to vault is disabled. Unset `KWONFIG_DISABLE_SECRETS` environment variable to enable it.",
+        match="Access to vault is disabled. Unset `KONFETTI_DISABLE_SECRETS` environment variable to enable it.",
     ):
         action(config)
 
@@ -103,7 +103,7 @@ def test_path_not_string():
     else:
         message = "'path' must be <class 'str'>"
     with pytest.raises(TypeError, match=message):
-        kwonfig.vault(1)
+        konfetti.vault(1)
 
 
 @pytest.mark.parametrize(
@@ -157,7 +157,7 @@ def test_disable_defaults(config, monkeypatch):
 
 @pytest.fixture
 def config_with_cached_vault(vault_prefix):
-    return KWonfig(vault_backend=VaultBackend(vault_prefix, cache_ttl=1))
+    return Konfig(vault_backend=VaultBackend(vault_prefix, cache_ttl=1))
 
 
 SECRET_DATA = {"DECIMAL": "1.3", "IS_SECRET": True, "SECRET": "value"}

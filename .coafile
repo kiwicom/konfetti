@@ -1,5 +1,5 @@
 [all]
-files = src/kwonfig/**.py, test/**.py, *.(yml|yaml), *.md, *requirements.txt, .coafile
+files = src/konfetti/**.py, test/**.py, *.(yml|yaml), *.md, *requirements.txt, .coafile
 
 indent_size = 4
 use_spaces = yes
@@ -15,14 +15,14 @@ bears = LineCountBear
 
 [all.python]
 language = python
-files = src/kwonfig/**.py, test/**.py
+files = src/konfetti/**.py, test/**.py
 
 [all.python.keywords]
 language = python
-files = src/kwonfig/**.py
+files = src/konfetti/**.py
 bears = KeywordBear
 keywords =
-  from kwonfig,
+  from konfetti,
   FIXME,
   pdb.set_trace(),
   sys.path.insert,
@@ -44,7 +44,7 @@ preferred_quotation = "
 [all.python.imports]
 bears = PyImportSortBear
 force_single_line_imports = no
-known_first_party_imports = kwonfig, test
+known_first_party_imports = konfetti, test
 isort_multi_line_output = 3
 include_trailing_comma_in_import = yes
 default_import_section = THIRDPARTY

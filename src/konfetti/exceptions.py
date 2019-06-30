@@ -1,23 +1,23 @@
-class KWonfigError(Exception):
-    """Common error for all errors in `kwonfig`."""
+class KonfettiError(Exception):
+    """Common error for all errors in `konfetti`."""
 
 
-class MissingError(AttributeError, KWonfigError):
+class MissingError(AttributeError, KonfettiError):
     """Config option is missing in the given settings module."""
 
     # Should be inherited from AttributeError because tools like Celery rely
     # on this behavior
 
 
-class SettingsNotSpecified(KWonfigError):
+class SettingsNotSpecified(KonfettiError):
     """Environment variable, that points to a setting module is not set."""
 
 
-class SettingsNotLoadable(KWonfigError):
+class SettingsNotLoadable(KonfettiError):
     """Settings module is not found or can't be imported."""
 
 
-class VaultBackendMissing(KWonfigError):
+class VaultBackendMissing(KonfettiError):
     """A secret variable is accessed, but vault backend is not configured."""
 
 
@@ -25,9 +25,9 @@ class SecretKeyMissing(MissingError):
     """Path exists in Vault, but doesn't contain specified value."""
 
 
-class ForbiddenOverrideError(KWonfigError):
+class ForbiddenOverrideError(KonfettiError):
     """An attempt to override configuration with a key that doesn't exist in the configuration."""
 
 
-class InvalidSecretOverrideError(KWonfigError):
+class InvalidSecretOverrideError(KonfettiError):
     """Environment variable for secret override contains invalid or non-JSON data."""

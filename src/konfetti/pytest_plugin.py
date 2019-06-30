@@ -7,7 +7,7 @@ import pytest
 
 @attr.s
 class ConfigWrapper(object):
-    """For proxying `__setattr__` calls as `_configure` to `KWonfig` instances."""
+    """For proxying `__setattr__` calls as `_configure` to `Konfig` instances."""
 
     config = attr.ib()
 

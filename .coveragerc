@@ -1,12 +1,12 @@
 [run]
 branch = True
 parallel = True
-source = kwonfig
+source = konfetti
 
 [paths]
 source =
-   src/kwonfig
-   .tox/*/lib/python*/site-packages/kwonfig
+   src/konfetti
+   .tox/*/lib/python*/site-packages/konfetti
 
 [report]
 show_missing = True

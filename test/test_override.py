@@ -2,8 +2,8 @@ import sys
 
 import pytest
 
-from kwonfig import KWonfig
-from kwonfig.exceptions import ForbiddenOverrideError
+from konfetti import Konfig
+from konfetti.exceptions import ForbiddenOverrideError
 
 pytestmark = [pytest.mark.usefixtures("settings")]
 
@@ -302,7 +302,7 @@ def test_override_unknown_option():
 
     Active only with `strict_override` config option.
     """
-    config = KWonfig(strict_override=True)
+    config = Konfig(strict_override=True)
     with pytest.raises(
         ForbiddenOverrideError,
         match="Can't override `NOT_EXIST` config option, because it is not defined in the config module",
@@ -312,7 +312,7 @@ def test_override_unknown_option():
 
 
 def test_strict_override_valid():
-    config = KWonfig(strict_override=True)
+    config = Konfig(strict_override=True)
     with config.override(INTEGER=123):
         assert config.INTEGER == 123
 
@@ -362,7 +362,7 @@ def test_override_context_manager_nested(testdir):
 
 def test_no_setup_on_override(mocked_import_config_module):
     """If overridden option is accessed, then config is not loaded."""
-    config = KWonfig(strict_override=False)
+    config = Konfig(strict_override=False)
     with config.override(EXAMPLE="awesome"):
         assert config.EXAMPLE == "awesome"
     mocked_import_config_module.assert_not_called()
@@ -370,7 +370,7 @@ def test_no_setup_on_override(mocked_import_config_module):
 
 def test_setup_on_override(mocked_import_config_module):
     """If non-overridden option is accessed, then config should be loaded."""
-    config = KWonfig()
+    config = Konfig()
     with config.override(SOMETHING="awesome"):
         assert config.EXAMPLE == "test"
     # Py2.7, Py3.5: replace with `assert_called` when 2.7/3.5 support will be dropped.

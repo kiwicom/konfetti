@@ -1,4 +1,4 @@
-from kwonfig import env, vault
+from konfetti import env, vault
 
 KEY = "value"
 DEBUG = env("DEBUG", default=True, cast=bool)

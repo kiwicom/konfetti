@@ -21,13 +21,13 @@ with open("test-requirements.in") as f:
     tests_require = [line for line in f if line and line[0] not in "#-"]
 
 setup(
-    name="kwonfig",
+    name="konfetti",
     version="0.6.0",
-    url="https://github.com/kiwicom/kwonfig",
+    url="https://github.com/kiwicom/konfetti",
     license="MIT",
     author="Dmitry Dygalo",
     author_email="dmitry.dygalo@kiwi.com",
-    description="`kwonfig` provides a framework-independent way for "
+    description="`konfetti` provides a framework-independent way for "
     "configuration of applications or libraries written in Python.",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",

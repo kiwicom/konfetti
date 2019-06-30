@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from kwonfig import env, lazy, vault, vault_file
+from konfetti import env, lazy, vault, vault_file
 
 KEY = "value"
 DEBUG = env("DEBUG", default=True, cast=bool)

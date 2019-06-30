@@ -12,7 +12,7 @@ test:
 	pytest test -v
 
 docker-test:
-	docker-compose -f docker-compose-tests.yml run kwonfig
+	docker-compose -f docker-compose-tests.yml run konfetti
 
 tox-test:
 	tox -p all
@@ -21,10 +21,10 @@ pylint:
 	tox -e pylint
 
 black:
-	black -l 120 src/kwonfig docs test setup.py
+	black -l 120 src/konfetti docs test setup.py
 
 mypy:
-	mypy --config-file ./mypy.ini -p kwonfig
+	mypy --config-file ./mypy.ini src/konfetti
 
 install:
 	ARCHFLAGS="-arch x86_64" pip install -r ./requirements.txt

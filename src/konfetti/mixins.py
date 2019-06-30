@@ -62,6 +62,6 @@ class DefaultMixin(object):
             raise exceptions.MissingError(
                 "Variable `{}` is not found and has no `default` specified".format(self.name)  # type: ignore
             )
-        if callable(self.default):
-            return self.default()
+        if callable(self.default):  # type: ignore
+            return self.default()  # type: ignore
         return self.default  # type: ignore

@@ -1,6 +1,6 @@
 import pytest
 
-from kwonfig.utils import flatten_dict, rebuild_dict
+from konfetti.utils import flatten_dict, rebuild_dict
 
 
 @pytest.mark.parametrize("value, expected", (({}, []), ({"A": 1}, [(["A"], 1)]), ({"A": {"B": 1}}, [(["A", "B"], 1)])))

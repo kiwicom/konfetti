@@ -2,7 +2,7 @@
 version: "3.7"
 
 services:
-  kwonfig:
+  konfetti:
     image: kiwicom/tox
     environment:
       TEST_VAULT_ADDR: http://vault:8200

@@ -1,16 +1,16 @@
-# kwonfig
+# konfetti
 
-![codecov](https://codecov.io/gh/kiwicom/kwonfig/branch/master/graph/badge.svg)
-![Build](https://img.shields.io/travis/kiwicom/kwonfig.svg)
-![Version](https://img.shields.io/pypi/v/kwonfig.svg)
-![Python versions](https://img.shields.io/pypi/pyversions/kwonfig.svg)
-![License](https://img.shields.io/pypi/l/kwonfig.svg)
+![codecov](https://codecov.io/gh/kiwicom/konfetti/branch/master/graph/badge.svg)
+![Build](https://img.shields.io/travis/kiwicom/konfetti.svg)
+![Version](https://img.shields.io/pypi/v/konfetti.svg)
+![Python versions](https://img.shields.io/pypi/pyversions/konfetti.svg)
+![License](https://img.shields.io/pypi/l/konfetti.svg)
 
 ## Description
 
 NOTE: The documentation is in progress
 
-`kwonfig` provides a framework-independent way for configuration of applications or libraries written in Python.
+`konfetti` provides a framework-independent way for configuration of applications or libraries written in Python.
 
 Key features:
 
@@ -30,7 +30,7 @@ The interface design and features are heavily inspired by `Django` & `decouple`.
 
 ## Quickstart
 
-To use `kwonfig` you need to define:
+To use `konfetti` you need to define:
 
 - configuration variables in a module or a class;
 - an access point;
@@ -39,7 +39,7 @@ To use `kwonfig` you need to define:
 
 ```python
 # app_name/settings/production.py
-from kwonfig import env, vault
+from konfetti import env, vault
 
 VAULT_ADDR = env("VAULT_ADDR")
 VAULT_TOKEN = env("VAULT_TOKEN")
@@ -54,14 +54,14 @@ DATABASE_URI = vault("path/to/db")
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KWonfig, VaultBackend
+from konfetti import Konfig, VaultBackend
 
-config = KWonfig(vault_backend=VaultBackend("/secret/team"))
+config = Konfig(vault_backend=VaultBackend("/secret/team"))
 ```
 
-`kwonfig` relies on `KWONFIG` environment variable to discover your settings module, in the case above:
+`konfetti` relies on `KONFETTI_SETTINGS` environment variable to discover your settings module, in the case above:
 
-`export KWONFIG=app_name.settings.production`
+`export KONFETTI_SETTINGS=app_name.settings.production`
 
 ### Usage
 
@@ -79,10 +79,10 @@ def something():
 
 **Table of contents**:
 
-- [Lazy evaluation](https://github.com/kiwicom/kwonfig#lazy-evaluation)
-- [Environment](https://github.com/kiwicom/kwonfig#environment)
-- [Vault](https://github.com/kiwicom/kwonfig#vault)
-- [Testing](https://github.com/kiwicom/kwonfig#testing)
+- [Lazy evaluation](https://github.com/kiwicom/konfetti#lazy-evaluation)
+- [Environment](https://github.com/kiwicom/konfetti#environment)
+- [Vault](https://github.com/kiwicom/konfetti#vault)
+- [Testing](https://github.com/kiwicom/konfetti#testing)
 
 ### Lazy evaluation
 
@@ -100,7 +100,7 @@ It could be done either with direct accessing needed variables or with `config.r
 ### Environment
 
 ```python
-from kwonfig import env
+from konfetti import env
 
 VARIABLE = env("VARIABLE_NAME", default="foo") 
 ```
@@ -109,7 +109,7 @@ Since environment variables are strings, there is a `cast` option to convert
 given variable from a string to the desired type:
 
 ```python
-from kwonfig import env
+from konfetti import env
 
 VARIABLE = env("VARIABLE_NAME", default=42, cast=int)
 ```
@@ -119,7 +119,7 @@ If there is a need to use the environment variable immediately, it could be
 evaluated via `str` call (other ways could be added on demand):
 
 ```python
-from kwonfig import env, vault
+from konfetti import env, vault
 
 DATABASE_ROLE = env("DATABASE_ROLE", default="booking")
 
@@ -138,9 +138,9 @@ both the environment variable and the `.env` record exists, `False` by default.
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KWonfig
+from konfetti import Konfig
 
-config = KWonfig(dotenv="path/to/.env", dotenv_override=False)
+config = Konfig(dotenv="path/to/.env", dotenv_override=False)
 ```
 
 ### Vault
@@ -151,15 +151,15 @@ To use Vault as a secrets storage you need to configure the access point:
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KWonfig, VaultBackend
+from konfetti import Konfig, VaultBackend
 
-config = KWonfig(vault_backend=VaultBackend("your/prefix"))
+config = Konfig(vault_backend=VaultBackend("your/prefix"))
 ```
 
 There are two Vault backends available:
 
-- `kwonfig.VaultBackend`
-- `kwonfig.AsyncVaultBackend`
+- `konfetti.VaultBackend`
+- `konfetti.AsyncVaultBackend`
 
 The main difference is that the latter requires using `await` to access 
 the secret value (the call will be handled asynchronously under the hood), otherwise the interfaces and capabilities are the same.
@@ -173,7 +173,7 @@ Every Vault secret needs a `path` to be used as a lookup (leading and trailing s
 
 ```python
 # app_name/settings/production.py
-from kwonfig import vault
+from konfetti import vault
 
 WHOLE_SECRET = vault("path/to")
 ```
@@ -190,7 +190,7 @@ You can specify a specific key to be returned for a config option with `[]` synt
 
 ```python
 # app_name/settings/production.py
-from kwonfig import vault
+from konfetti import vault
 
 KEY = vault("path/to")["key"]
 ```
@@ -205,7 +205,7 @@ Using square brackets will not trigger evaluation - you could specify as many le
 
 ```python
 # app_name/settings/production.py
-from kwonfig import vault
+from konfetti import vault
 
 DEEP = vault("path/to")["deeply"]["nested"]["key"]
 ```
@@ -215,7 +215,7 @@ Casting could be specified as well:
 ```python
 # app_name/settings/production.py
 from decimal import Decimal
-from kwonfig import vault
+from konfetti import vault
 
 DECIMAL = vault("path/to", cast=Decimal)["fee_amount"]  # stored as string
 ```
@@ -226,7 +226,7 @@ DECIMAL = vault("path/to", cast=Decimal)["fee_amount"]  # stored as string
 Decimal("0.15")
 ```
 
-Sometimes you need to access to some secrets dynamically. `KWonfig` provides a way to do it:
+Sometimes you need to access to some secrets dynamically. `Konfig` provides a way to do it:
 
 ```python
 >>> from app_name.settings import config
@@ -240,7 +240,7 @@ It is possible to get a file-like interface for vault secret.
 
 ```python
 # app_name/settings/production.py
-from kwonfig import vault_file
+from konfetti import vault_file
 
 KEY = vault_file("path/to/file")["key"]
 ```
@@ -285,7 +285,7 @@ Example:
 
 ```python
 # app_name/settings/production.py
-from kwonfig import vault
+from konfetti import vault
 
 KEY = vault("path/to")["key"]
 ```
@@ -322,23 +322,23 @@ If you don't need this behavior, it could be turned off with `try_env_first=Fals
 
 ```python
 # app_name/settings/__init__.py
-from kwonfig import KWonfig, VaultBackend
+from konfetti import Konfig, VaultBackend
 
-config = KWonfig(vault_backend=VaultBackend("your/prefix", try_env_first=False))
+config = Konfig(vault_backend=VaultBackend("your/prefix", try_env_first=False))
 ```
 
 ##### Disabling access to secrets
 
-If you want to forbid any access to Vault (e.g. in your tests) you can set `KWONFIG_DISABLE_SECRETS` environment
+If you want to forbid any access to Vault (e.g. in your tests) you can set `KONFETTI_DISABLE_SECRETS` environment
 variable with `1` / `on` / `true` / `yes`.
 
 ```python
 >>> import os
 >>> from app_name.settings import config
->>> os.environ["KWONFIG_DISABLE_SECRETS"] = "1"
+>>> os.environ["KONFETTI_DISABLE_SECRETS"] = "1"
 >>> config.get_secret("path/to")["key"]
 ...
-RuntimeError: Access to secrets is disabled. Unset KWONFIG_DISABLE_SECRETS variable to enable it. 
+RuntimeError: Access to secrets is disabled. Unset KONFETTI_DISABLE_SECRETS variable to enable it. 
 ```
 
 ##### Caching
@@ -346,18 +346,18 @@ RuntimeError: Access to secrets is disabled. Unset KWONFIG_DISABLE_SECRETS varia
 Vault values could be cached in memory:
 
 ```python
-config = KWonfig(vault_backend=VaultBackend("your/prefix", cache_ttl=60))
+config = Konfig(vault_backend=VaultBackend("your/prefix", cache_ttl=60))
 ```
 
 By default, caching is disabled.
 
 #### Lazy options
 
-If there is a need to calculate config options dynamically (e.g., if it depends on values of other options) `kwonfig`
+If there is a need to calculate config options dynamically (e.g., if it depends on values of other options) `konfetti`
 provides `lazy`:
 
 ```python
-from kwonfig import lazy
+from konfetti import lazy
 
 LAZY_LAMBDA = lazy(lambda config: config.KEY + "/" + config.SECRET + "/" + config.REQUIRED)
 
@@ -372,10 +372,10 @@ def lazy_property(config):
 It is usually a good idea to use a slightly different configuration for tests (disabled tracing, sentry, etc.).
 
 ```
-export KWONFIG=app_name.settings.tests
+export KONFETTI_SETTINGS=app_name.settings.tests
 ```
 
-It is very useful to override some config options in tests. `KWonfig.override` will override config options defined
+It is very useful to override some config options in tests. `Konfig.override` will override config options defined
 in the settings module. It works as a context manager or a decorator to provide explicit setup & clean up for overridden options.
 
 ```python
@@ -422,13 +422,13 @@ def test_not_affected():
 
 NOTE. `setup_class/setUp` and `teardown_class/tearDown` methods will work with `override`.
 
-`kwonfig` includes a pytest integration that gives you a fixture, that allows you to override given config without
+`konfetti` includes a pytest integration that gives you a fixture, that allows you to override given config without
 using a context manager/decorator approach and automatically rollbacks changes made:
 
 ```python
 import pytest
 from app_name.settings import config
-from kwonfig.pytest_plugin import make_fixture
+from konfetti.pytest_plugin import make_fixture
 
 # create a fixture. the default name is "settings",
 # but could be specified via `name` option
@@ -472,13 +472,13 @@ NOTE. It is forbidden to create two fixtures from the same config instances.
 The environment variable name could be customized via `config_variable_name` option:
 
 ```python
-config = KWonfig(config_variable_name="APP_CONFIG")
+config = Konfig(config_variable_name="APP_CONFIG")
 ```
 
 Alternatively, it is possible to specify class-based settings:
 
 ```python
-from kwonfig import env, vault
+from konfetti import env, vault
 
 
 class ProductionSettings:
@@ -602,7 +602,7 @@ $ make docker-test
 or alternatively:
 
 ```bash
-$ docker-compose -f docker-compose-tests.yml run kwonfig
+$ docker-compose -f docker-compose-tests.yml run konfetti
 ```
 
 ## Contributing

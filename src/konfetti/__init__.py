@@ -1,4 +1,4 @@
-from .core import KWonfig
+from .core import Konfig
 from .environ import EnvVariable
 from .laziness import LazyVariable
 from .vault import *

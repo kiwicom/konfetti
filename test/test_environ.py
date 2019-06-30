@@ -1,8 +1,8 @@
 import pytest
 
-from kwonfig import env
-from kwonfig.exceptions import MissingError
-from kwonfig.mixins import _cast_boolean
+from konfetti import env
+from konfetti.exceptions import MissingError
+from konfetti.mixins import _cast_boolean
 
 pytestmark = [pytest.mark.usefixtures("settings", "env")]
 

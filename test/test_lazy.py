@@ -1,6 +1,6 @@
 import pytest
 
-from kwonfig import lazy
+from konfetti import lazy
 
 pytestmark = [pytest.mark.usefixtures("settings")]
 

@@ -21,7 +21,7 @@ def wrap_coro(context_manager, coro):
 def make_async_callback(coro, callback):
     """Wrap calling of the callback on the coro result in a coro.
 
-    Needed to provide an awaitable response to the KWonfig users.
+    Needed to provide an awaitable response to the Konfig users.
     """
 
     async def inner():

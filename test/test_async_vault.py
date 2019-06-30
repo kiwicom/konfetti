@@ -5,10 +5,10 @@ from typing import Coroutine
 import aiohttp
 import pytest
 
-from kwonfig import env, KWonfig
-from kwonfig._async import make_async_callback, make_simple_coro
-from kwonfig.exceptions import MissingError, SecretKeyMissing
-from kwonfig.vault import AsyncVaultBackend
+from konfetti import env, Konfig
+from konfetti._async import make_async_callback, make_simple_coro
+from konfetti.exceptions import MissingError, SecretKeyMissing
+from konfetti.vault import AsyncVaultBackend
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.async_vault, pytest.mark.usefixtures("env", "vault_data")]
 
@@ -53,10 +53,10 @@ async def test_get_secret(config):
 @pytest.mark.parametrize("action", (lambda c: c.get_secret("path/to"), lambda c: c.SECRET))
 async def test_disable_secrets(config, monkeypatch, action):
     # This option completely disables Vault access
-    monkeypatch.setenv("KWONFIG_DISABLE_SECRETS", "1")
+    monkeypatch.setenv("KONFETTI_DISABLE_SECRETS", "1")
     with pytest.raises(
         RuntimeError,
-        match="Access to vault is disabled. Unset `KWONFIG_DISABLE_SECRETS` environment variable to enable it.",
+        match="Access to vault is disabled. Unset `KONFETTI_DISABLE_SECRETS` environment variable to enable it.",
     ):
         await action(config)
 
@@ -70,7 +70,7 @@ async def test_override_with_default(config, monkeypatch):
 @pytest.mark.parametrize("url", ("http://localhost:8200", "http://localhost:8200/"))
 async def test_get_full_url(url):
     # Slashes don't matter
-    from kwonfig.vault.asynchronous import _get_full_url
+    from konfetti.vault.asynchronous import _get_full_url
 
     assert _get_full_url(url, "path/to") == "http://localhost:8200/v1/path/to"
 
@@ -93,7 +93,7 @@ async def test_make_simple_coro():
 
 @pytest.fixture
 def config_with_cached_vault(vault_prefix):
-    return KWonfig(vault_backend=AsyncVaultBackend(vault_prefix, cache_ttl=1))
+    return Konfig(vault_backend=AsyncVaultBackend(vault_prefix, cache_ttl=1))
 
 
 SECRET_DATA = {"DECIMAL": "1.3", "IS_SECRET": True, "SECRET": "value"}
@@ -134,8 +134,8 @@ async def test_no_recaching(config_with_cached_vault, mocker, freezer, vault_tok
 
 async def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
     # All options, including dicts should be evaluated
-    monkeypatch.setenv("KWONFIG", "test_app.settings.subset")
-    config = KWonfig(vault_backend=AsyncVaultBackend(vault_prefix))
+    monkeypatch.setenv("KONFETTI_SETTINGS", "test_app.settings.subset")
+    config = Konfig(vault_backend=AsyncVaultBackend(vault_prefix))
     assert await config.asdict() == {
         "DEBUG": True,
         "SECRET": "value",
@@ -150,7 +150,7 @@ async def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
 
 async def test_asdict_shortcut(vault_prefix, vault_addr, vault_token):
     # If there are no coroutines - nothing should be awaited
-    config = KWonfig(vault_backend=AsyncVaultBackend(vault_prefix))
+    config = Konfig(vault_backend=AsyncVaultBackend(vault_prefix))
 
     class TestSettings:
         SECRET = 1
