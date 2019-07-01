@@ -8,25 +8,23 @@
 
 ## Description
 
-NOTE: The documentation is in progress
+`konfetti` is a Pythonic configuration management with an intuitive API, lazy evaluation and (a)sync Vault support.
 
-`konfetti` provides a framework-independent way for configuration of applications or libraries written in Python.
-
-Key features:
+The interface design and features are heavily inspired by [`decouple`](https://github.com/henriquebastos/python-decouple), [`Django`](https://github.com/django/django), [`envparse`](https://github.com/rconradharris/envparse) and [`dynaconf`](https://github.com/rochacbruno/dynaconf). 
+ 
+**Key features**:
 
 - Lazy evaluation; 
 - Built-in environment variables support;
-- Built-in Vault support;
-- Helpers for tests.
+- Built-in async Vault access support;
+- Helpers for tests.  
 
-The primary motivation for building this library is to unify all configuration in different projects and make it as lazy as possible. In this case, we could get these benefits:
+**Benefits of lazy evaluation**:
 
-- No need to full app configuration when running a subset of tests that don't need a full config;
+- Faster & simpler test runs; No need for evaluation the the whole project config if it is not used
 - Avoid network calls during imports until necessary; 
 
-The interface design and features are heavily inspired by `Django` & `decouple`.
-
-**Supported Python versions**: 2.7 & 3.5 - 3.8
+**Python versions**: 2.7, 3.5, 3.6, 3.7, 3.8
 
 ## Quickstart
 
@@ -48,15 +46,16 @@ DEBUG = env("DEBUG", default=False)
 DATABASE_URI = vault("path/to/db")
 ```
 
-**NOTE**: The naming convention for variables names is to use upper case, other variables will be ignored.
+The naming convention for variables names is upper case, other variables will be ignored.
+To work with Vault it is required to specify `VAULT_ADDR` and `VAULT_TOKEN` in the settings module.
 
 ### Access point
 
 ```python
 # app_name/settings/__init__.py
-from konfetti import Konfig, VaultBackend
+from konfetti import Konfig, AsyncVaultBackend
 
-config = Konfig(vault_backend=VaultBackend("/secret/team"))
+config = Konfig(vault_backend=AsyncVaultBackend("/secret/team"))
 ```
 
 `konfetti` relies on `KONFETTI_SETTINGS` environment variable to discover your settings module, in the case above:
@@ -71,8 +70,8 @@ features are implemented in the access point level.
 ```python
 from app_name.settings import config
 
-def something():
-    config.DATABASE_URI
+async def something():
+    await config.DATABASE_URI
 ```
 
 ## API
@@ -151,9 +150,9 @@ To use Vault as a secrets storage you need to configure the access point:
 
 ```python
 # app_name/settings/__init__.py
-from konfetti import Konfig, VaultBackend
+from konfetti import Konfig, AsyncVaultBackend
 
-config = Konfig(vault_backend=VaultBackend("your/prefix"))
+config = Konfig(vault_backend=AsyncVaultBackend("your/prefix"))
 ```
 
 There are two Vault backends available:
@@ -181,8 +180,8 @@ WHOLE_SECRET = vault("path/to")
 In this case all key/value pairs will be loaded on evaluation:
 
 ```python
->>> from app_name.settings import config
->>> config.WHOLE_SECRET
+In [1]: from app_name.settings import config
+In [2]: await config.WHOLE_SECRET
 {'key': 'value', 'foo': 'bar'}
 ```
 
@@ -196,8 +195,8 @@ KEY = vault("path/to")["key"]
 ```
 
 ```python
->>> from app_name.settings import config
->>> config.KEY
+In [1]: from app_name.settings import config
+In [2]: await config.KEY
 value
 ```
 
@@ -221,16 +220,16 @@ DECIMAL = vault("path/to", cast=Decimal)["fee_amount"]  # stored as string
 ```
 
 ```python
->>> from app_name.settings import config
->>> config.DECIMAL
+In [1]: from app_name.settings import config
+In [2]: await config.DECIMAL
 Decimal("0.15")
 ```
 
 Sometimes you need to access to some secrets dynamically. `Konfig` provides a way to do it:
 
 ```python
->>> from app_name.settings import config
->>> config.get_secret("path/to")["key"]
+In [1]: from app_name.settings import config
+In [2]: await config.get_secret("path/to")["key"]
 value
 ```
 
@@ -246,8 +245,8 @@ KEY = vault_file("path/to/file")["key"]
 ```
 
 ```python
->>> from app_name.settings import config
->>> config.KEY.readlines()
+In [1]: from app_name.settings import config
+In [2]: (await config.KEY).readlines()
 [b'value']
 ```
 
@@ -260,10 +259,10 @@ any type for a key in a secret and a `dict` for the whole secret.
 DEFAULT = vault("path/to", default="default")["DEFAULT"]
 DEFAULT_SECRET = vault("path/to", default={"DEFAULT_SECRET": "default_secret"})
 
->>> from app_name.settings import config
->>> config.DEFAULT
+In [1]: from app_name.settings import config
+In [2]: await config.DEFAULT
 "default"
->>> config.DEFAULT_SECRET
+In [3]: await config.DEFAULT_SECRET
 {"DEFAULT_SECRET": "default_secret"}
 ```
 
@@ -291,19 +290,19 @@ KEY = vault("path/to")["key"]
 ```
 
 ```python
->>> from app_name.settings import config
->>> config.KEY
+In [1]: from app_name.settings import config
+In [2]: await config.KEY
 value
->>> import os
->>> os.environ["PATH__TO"] = '{"key": "overridden"}'
->>> config.KEY
+In [3]: import os
+In [4]: os.environ["PATH__TO"] = '{"key": "overridden"}'
+In [5]: await config.KEY
 overridden
 ```
 
 To check how to override certain option there is a `config.vault.get_override_examples()` helper:
 
 ```python
->>> config.vault.get_override_examples()
+In [1]: config.vault.get_override_examples()
 {
     "NESTED_SECRET": {
         "PATH__TO__NESTED": '{"NESTED_SECRET": {"nested": "example_value"}}'
@@ -322,9 +321,9 @@ If you don't need this behavior, it could be turned off with `try_env_first=Fals
 
 ```python
 # app_name/settings/__init__.py
-from konfetti import Konfig, VaultBackend
+from konfetti import Konfig, AsyncVaultBackend
 
-config = Konfig(vault_backend=VaultBackend("your/prefix", try_env_first=False))
+config = Konfig(vault_backend=AsyncVaultBackend("your/prefix", try_env_first=False))
 ```
 
 ##### Disabling access to secrets
@@ -333,10 +332,10 @@ If you want to forbid any access to Vault (e.g. in your tests) you can set `KONF
 variable with `1` / `on` / `true` / `yes`.
 
 ```python
->>> import os
->>> from app_name.settings import config
->>> os.environ["KONFETTI_DISABLE_SECRETS"] = "1"
->>> config.get_secret("path/to")["key"]
+In [1]: import os
+In [2]: from app_name.settings import config
+In [3]: os.environ["KONFETTI_DISABLE_SECRETS"] = "1"
+In [4]: (await config.get_secret("path/to"))["key"]
 ...
 RuntimeError: Access to secrets is disabled. Unset KONFETTI_DISABLE_SECRETS variable to enable it. 
 ```
@@ -346,7 +345,7 @@ RuntimeError: Access to secrets is disabled. Unset KONFETTI_DISABLE_SECRETS vari
 Vault values could be cached in memory:
 
 ```python
-config = Konfig(vault_backend=VaultBackend("your/prefix", cache_ttl=60))
+config = Konfig(vault_backend=AsyncVaultBackend("your/prefix", cache_ttl=60))
 ```
 
 By default, caching is disabled.
@@ -422,7 +421,7 @@ def test_not_affected():
 
 NOTE. `setup_class/setUp` and `teardown_class/tearDown` methods will work with `override`.
 
-`konfetti` includes a pytest integration that gives you a fixture, that allows you to override given config without
+`konfetti` includes a `pytest` integration that gives you a fixture, that allows you to override given config without
 using a context manager/decorator approach and automatically rollbacks changes made:
 
 ```python
@@ -492,7 +491,7 @@ class ProductionSettings:
 It possible to load the whole config and get its content as a dict:
 
 ```python
->>> config.asdict()
+In [1]: await config.asdict()
 {
     "ENV": "env value",
     "KEY": "static value",
@@ -503,7 +502,7 @@ It possible to load the whole config and get its content as a dict:
 If you need to validate that certain variables are present in the config, there is `require`:
 
 ```python
->>> config.require("SECRET")
+In [1]: config.require("SECRET")
 ...
 MissingError: Options ['SECRET'] are required
 ```
@@ -511,7 +510,7 @@ MissingError: Options ['SECRET'] are required
 Or to check that they are defined:
 
 ```python
->>> "SECRET" in config
+In [1]: "SECRET" in config
 True
 ```
 
@@ -539,7 +538,9 @@ from app_name.settings import config
 cache_redis = StrictRedis.from_url(config.REDIS_URL)
 ```
 
-However, if you want to have a global Redis instance, consider using `python-lazy-object-proxy`:
+In this case on each usage the redis client will be re-evaluated, which might be not good for performance reasons.
+
+As an alternative you could have a global Redis instance by using `python-lazy-object-proxy`:
 
 ```bash
 pip install lazy-object-proxy
@@ -552,6 +553,8 @@ import lazy_object_proxy
 
 cache_redis = lazy_object_proxy.Proxy(get_redis_client)
 ```
+
+**NOTE**. Do not forget to clean up shared resources when it is needed, usually on the application / testcase teardown.
 
 #### Why?
 
