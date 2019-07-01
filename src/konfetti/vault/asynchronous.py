@@ -22,10 +22,7 @@ def cached_call(method):
         value = self._get_from_cache(path)
         if value is EMPTY:
             value = await method(self, path, url, token)
-        else:
-            return value
-
-        self._set_to_cache(path, value)
+            self._set_to_cache(path, value)
         return value
 
     return inner
