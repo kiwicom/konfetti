@@ -29,8 +29,8 @@ setup(
     author_email="dmitry.dygalo@kiwi.com",
     description="`konfetti` provides a framework-independent way for "
     "configuration of applications or libraries written in Python.",
-    long_description=read("README.md"),
-    long_description_content_type="text/markdown",
+    long_description=read("README.rst"),
+    long_description_content_type="text/x-rst",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
