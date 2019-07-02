@@ -4,6 +4,7 @@ from io import BytesIO
 import sys
 
 import pytest
+from requests import RequestException
 
 import konfetti
 from konfetti import Konfig
@@ -224,3 +225,10 @@ def test_cast_date(config):
 
 def test_cast_datetime(config):
     assert config.DATETIME == datetime(year=2019, month=1, day=25, hour=14, minute=35, second=5)
+
+
+def test_retry(config, mocker):
+    mocker.patch("requests.adapters.HTTPAdapter.send", side_effect=RequestException)
+    with pytest.raises(RequestException):
+        config.SECRET
+    assert config.vault_backend.load.retry.statistics["attempt_number"] == 3

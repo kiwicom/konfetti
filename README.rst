@@ -1,7 +1,7 @@
 .. _-konfetti-:
 
 🎊 konfetti 🎊
-============
+==============
 
 |codecov| |Build| |Version| |Python versions| |License|
 

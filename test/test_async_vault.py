@@ -161,3 +161,10 @@ async def test_asdict_shortcut(vault_prefix, vault_addr, vault_token):
     config._initialized = True
 
     assert await config.asdict() == {"SECRET": 1, "VAULT_ADDR": vault_addr, "VAULT_TOKEN": vault_token}
+
+
+async def test_retry(config, mocker):
+    mocker.patch("aiohttp.ClientSession._request", side_effect=aiohttp.ClientConnectionError)
+    with pytest.raises(aiohttp.ClientConnectionError):
+        await config.SECRET
+    assert config.vault_backend.load.retry.statistics["attempt_number"] == 3
