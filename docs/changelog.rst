@@ -6,6 +6,8 @@ Changelog
 `Unreleased`_
 -------------
 
+ - Added retry for Vault backends
+
 0.6.0 - 2019-06-30
 ------------------
 

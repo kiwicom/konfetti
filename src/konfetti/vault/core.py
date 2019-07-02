@@ -1,3 +1,4 @@
+from inspect import isgenerator
 from io import BytesIO
 import json
 from typing import Any, Callable, Dict, List, Tuple, Union  # ignore: PyUnusedCodeBear
@@ -51,7 +52,7 @@ class VaultVariable(CastableMixin):
         url, token = self._load_credentials(closure)
         self.validate_allowance_to_access_secrets()
         data = backend.load(self.path, url, token)
-        if iscoroutine(data):
+        if iscoroutine(data) or isgenerator(data):
             # To avoid syntax errors on Python 2.7
             from .._async import make_async_callback
 

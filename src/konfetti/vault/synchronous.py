@@ -22,14 +22,19 @@ def cached_call(method):
     return inner
 
 
-@attr.s(slots=True)
+@attr.s
 class VaultBackend(BaseVaultBackend):
     is_async = False
 
     def load(self, path, url, token):
         # type: (str, str, str) -> Dict[str, Any]
+
+        from requests.exceptions import RequestException
+        from tenacity import Retrying
+
+        retry = self._get_retry(Retrying, RequestException)
         full_path = self._get_full_path(path)
-        return self._call(full_path, url, token)
+        return retry.call(self._call, full_path, url, token)
 
     @cached_call
     def _call(self, path, url, token):

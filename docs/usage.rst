@@ -313,6 +313,30 @@ Vault values could be cached in memory:
 
 By default, caching is disabled.
 
+Retries
+'''''''
+
+Vault calls would be retried in case of network issues, by default it is 3 attempts or up to 15 seconds.
+
+This behavior could be changed via vault backend options
+
+.. code:: python
+
+    config = Konfig(vault_backend=AsyncVaultBackend("your/prefix", max_retries=3, max_retry_time=15))
+
+Also it is possible to pass retrying object with custom behavior, e.g. `tenacity.Retrying or tenacity.AsyncRetrying <https://github.com/jd/tenacity>`_:
+
+.. code:: python
+    from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
+    config = Konfig(vault_backend=VaultBackend(
+        "your/prefix",
+        retry=Retrying(
+            retry=retry_if_exception_type(YourException),
+            reraise=True,
+            stop=stop_after_attempt(2)
+        )
+    )
+
 Lazy options
 ^^^^^^^^^^^^
 
