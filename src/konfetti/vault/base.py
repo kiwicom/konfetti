@@ -12,6 +12,9 @@ class BaseVaultBackend(object):
     cache_ttl = attr.ib(type=Optional[Union[int, float]], validator=check_ttl, default=None)
     cache = attr.ib(init=False, default=NOT_SET)
     try_env_first = attr.ib(type=bool, default=True, validator=attr.validators.instance_of(bool))
+    max_retries = attr.ib(type=int, default=3, validator=attr.validators.instance_of(int))
+    max_retry_time = attr.ib(type=int, default=15, validator=attr.validators.instance_of(int))
+    retry = attr.ib(default=None)
 
     is_async = None  # type: Optional[bool]
 
@@ -38,3 +41,15 @@ class BaseVaultBackend(object):
     def _set_to_cache(self, path, value):
         if self.cache is not NOT_SET:
             self.cache.set(path, value)
+
+    def _get_retry(self, cls, exception):
+        retry = self.retry
+        if not retry:
+            from tenacity import retry_if_exception_type, stop_after_attempt, stop_after_delay
+
+            retry = cls(
+                retry=retry_if_exception_type(exception),
+                reraise=True,
+                stop=(stop_after_attempt(self.max_retries) | stop_after_delay(self.max_retry_time)),
+            )
+        return retry

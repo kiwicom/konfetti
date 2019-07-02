@@ -28,13 +28,17 @@ def cached_call(method):
     return inner
 
 
-@attr.s(slots=True)
+@attr.s
 class AsyncVaultBackend(BaseVaultBackend):
     is_async = True
 
     async def load(self, path, url, token):
+        from aiohttp import ClientConnectionError
+        from tenacity import AsyncRetrying
+
+        retry = self._get_retry(AsyncRetrying, ClientConnectionError)
         full_path = self._get_full_path(path)
-        return await self._call(full_path, url, token)
+        return await retry.call(self._call, full_path, url, token)
 
     @cached_call
     async def _call(self, path, url, token):

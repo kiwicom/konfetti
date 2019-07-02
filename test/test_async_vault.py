@@ -4,10 +4,11 @@ from typing import Coroutine
 
 import aiohttp
 import pytest
+from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt
 
 from konfetti import env, Konfig
 from konfetti._async import make_async_callback, make_simple_coro
-from konfetti.exceptions import MissingError, SecretKeyMissing
+from konfetti.exceptions import KonfettiError, MissingError, SecretKeyMissing
 from konfetti.vault import AsyncVaultBackend
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.async_vault, pytest.mark.usefixtures("env", "vault_data")]
@@ -161,3 +162,27 @@ async def test_asdict_shortcut(vault_prefix, vault_addr, vault_token):
     config._initialized = True
 
     assert await config.asdict() == {"SECRET": 1, "VAULT_ADDR": vault_addr, "VAULT_TOKEN": vault_token}
+
+
+async def test_retry(config, mocker):
+    mocker.patch("aiohttp.ClientSession._request", side_effect=aiohttp.ClientConnectionError)
+    m = mocker.patch.object(config.vault_backend, "_call", wraps=config.vault_backend._call)
+    with pytest.raises(aiohttp.ClientConnectionError):
+        await config.SECRET
+    assert m.called is True
+    assert m.call_count == 3
+
+
+async def test_retry_object(vault_prefix, mocker):
+    config = Konfig(
+        vault_backend=AsyncVaultBackend(
+            vault_prefix,
+            retry=AsyncRetrying(retry=retry_if_exception_type(KonfettiError), reraise=True, stop=stop_after_attempt(2)),
+        )
+    )
+    mocker.patch("aiohttp.ClientSession._request", side_effect=KonfettiError)
+    m = mocker.patch.object(config.vault_backend, "_call", wraps=config.vault_backend._call)
+    with pytest.raises(KonfettiError):
+        await config.SECRET
+    assert m.called is True
+    assert m.call_count == 2

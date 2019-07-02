@@ -4,10 +4,18 @@ from io import BytesIO
 import sys
 
 import pytest
+from requests import RequestException
+from tenacity import retry_if_exception_type, Retrying, stop_after_attempt
 
 import konfetti
 from konfetti import Konfig
-from konfetti.exceptions import InvalidSecretOverrideError, MissingError, SecretKeyMissing, VaultBackendMissing
+from konfetti.exceptions import (
+    InvalidSecretOverrideError,
+    KonfettiError,
+    MissingError,
+    SecretKeyMissing,
+    VaultBackendMissing,
+)
 from konfetti.utils import NOT_SET
 from konfetti.vault import VaultBackend
 from konfetti.vault.core import VaultVariable
@@ -224,3 +232,27 @@ def test_cast_date(config):
 
 def test_cast_datetime(config):
     assert config.DATETIME == datetime(year=2019, month=1, day=25, hour=14, minute=35, second=5)
+
+
+def test_retry(config, mocker):
+    mocker.patch("requests.adapters.HTTPAdapter.send", side_effect=RequestException)
+    m = mocker.patch.object(config.vault_backend, "_call", wraps=config.vault_backend._call)
+    with pytest.raises(RequestException):
+        config.SECRET
+    assert m.called is True
+    assert m.call_count == 3
+
+
+def test_retry_object(vault_prefix, mocker):
+    config = Konfig(
+        vault_backend=VaultBackend(
+            vault_prefix,
+            retry=Retrying(retry=retry_if_exception_type(KonfettiError), reraise=True, stop=stop_after_attempt(2)),
+        )
+    )
+    mocker.patch("requests.adapters.HTTPAdapter.send", side_effect=KonfettiError)
+    m = mocker.patch.object(config.vault_backend, "_call", wraps=config.vault_backend._call)
+    with pytest.raises(KonfettiError):
+        config.SECRET
+    assert m.called is True
+    assert m.call_count == 2

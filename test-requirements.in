@@ -6,4 +6,5 @@ pytest-mock
 aiohttp; python_version >= '3.5' # optional, move to requirements
 hvac  # optional
 typing; python_version < '3.5'
-mypy
+mypy; python_version >= '3.5'
+tenacity  # optional
