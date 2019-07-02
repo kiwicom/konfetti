@@ -8,7 +8,7 @@
 Description
 -----------
 
-``konfetti`` is a Pythonic configuration management with an intuitive
+``konfetti`` is a Python configuration management system with an intuitive
 API, lazy evaluation and (a)sync Vault support.
 
 The interface design and features are heavily inspired by `decouple`_, `Django`_, `envparse`_ and `dynaconf`_.
