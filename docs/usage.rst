@@ -1,7 +1,7 @@
 .. _usage:
 
-API
----
+Usage
+-----
 
 **Table of contents**:
 
@@ -389,7 +389,7 @@ Also, override works for classes (including inherited from
    def test_not_affected():
        assert config.INTEGER == 1
 
-NOTE. ``setup_class/setUp`` and ``teardown_class/tearDown`` methods will
+**NOTE**. ``setup_class/setUp`` and ``teardown_class/tearDown`` methods will
 work with ``override``.
 
 ``konfetti`` includes a ``pytest`` integration that gives you a fixture,
@@ -436,7 +436,7 @@ manager/decorator approach and automatically rollbacks changes made:
        assert config.INTEGER == 1
        assert settings.INTEGER == 1
 
-NOTE. It is forbidden to create two fixtures from the same config
+**NOTE**. It is forbidden to create two fixtures from the same config
 instances.
 
 Extras

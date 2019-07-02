@@ -1,7 +1,10 @@
 .. _contributing:
 
+Contributing
+------------
+
 Code formatting
----------------
+~~~~~~~~~~~~~~~
 
 In order to maintain code formatting consistency we use
 `black <https://github.com/ambv/black/>`__ to format the python files. A
@@ -22,7 +25,7 @@ follow instructions for
 `pyproject.toml <https://github.com/ambv/black#pyprojecttoml>`__
 
 Testing
--------
+~~~~~~~
 
 To run all tests:
 
