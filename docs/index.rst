@@ -10,6 +10,9 @@ Welcome to konfetti's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   usage
+   guide
+   contributing
    changelog
 
 Indices and tables
