@@ -79,7 +79,8 @@ in the access point level.
    from app_name.settings import config
 
    async def something():
-       await config.DATABASE_URI
+       await config.DATABASE_URI  # asynchronously taken from Vault
+       debug = config.DEBUG  # Usual sync access
 
 Documentation
 -------------
