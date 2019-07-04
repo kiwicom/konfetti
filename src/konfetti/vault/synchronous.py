@@ -33,16 +33,9 @@ class VaultBackend(BaseVaultBackend):
 
     def __attrs_post_init__(self):
         from requests.exceptions import RequestException
-        from tenacity import retry, retry_if_exception_type, stop_after_attempt, stop_after_delay, wait_exponential, \
-            Retrying
+        from tenacity import retry_if_exception_type, stop_after_attempt, Retrying
 
-        r = Retrying(
-            retry=retry_if_exception_type(RequestException),
-            reraise=True,
-            stop=stop_after_attempt(3),
-            # stop=(stop_after_attempt(3) | stop_after_delay(10)),
-            # wait=wait_exponential(multiplier=1, min=4, max=10),
-        )
+        r = Retrying(retry=retry_if_exception_type(RequestException), reraise=True, stop=stop_after_attempt(3))
         self.load = r.wraps(self.load)
 
     @cached_call

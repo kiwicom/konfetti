@@ -38,17 +38,12 @@ class AsyncVaultBackend(BaseVaultBackend):
 
     def __attrs_post_init__(self):
         from aiohttp import ClientConnectionError
-        from tenacity import retry_if_exception_type, stop_after_attempt, stop_after_delay, wait_exponential, \
-            AsyncRetrying
+        from tenacity import retry_if_exception_type, stop_after_attempt, AsyncRetrying
 
         r = AsyncRetrying(
-            retry=retry_if_exception_type(ClientConnectionError),
-            reraise=True,
-            stop=stop_after_attempt(3),
-            # stop=(stop_after_attempt(3) | stop_after_delay(10)),
-            # wait=wait_exponential(multiplier=1, min=4, max=10),
+            retry=retry_if_exception_type(ClientConnectionError), reraise=True, stop=stop_after_attempt(3)
         )
-        self.load = await r.wraps(self.load)
+        self.load = r.wraps(self.load)
 
     @cached_call
     async def _call(self, path, url, token):
