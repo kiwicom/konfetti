@@ -97,7 +97,7 @@ Konfetti supports Python 2.7, 3.5, 3.6, 3.7 and 3.8
    :target: https://codecov.io/gh/kiwicom/konfetti
 .. |Build| image:: https://img.shields.io/travis/kiwicom/konfetti.svg
    :target: https://travis-ci.org/kiwicom/konfetti
-.. |Version| image:: https://img.shields.io/pypi/v/konfetti.svg
+.. |Version| image:: https://travis-ci.org/kiwicom/konfetti.svg?branch=master
    :target: https://pypi.org/project/konfetti/
 .. |Python versions| image:: https://img.shields.io/pypi/pyversions/konfetti.svg
    :target: https://pypi.org/project/konfetti/
