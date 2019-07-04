@@ -94,6 +94,11 @@ Python support
 
 Konfetti supports Python 2.7, 3.5, 3.6, 3.7 and 3.8
 
+License
+-------
+
+The code in this project is licensed under `MIT license`_. By contributing to `konfetti`, you agree that your contributions will be licensed under its MIT license.
+
 .. |codecov| image:: https://codecov.io/gh/kiwicom/konfetti/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/kiwicom/konfetti
 .. |Build| image:: https://travis-ci.org/kiwicom/konfetti.svg?branch=master
@@ -109,3 +114,5 @@ Konfetti supports Python 2.7, 3.5, 3.6, 3.7 and 3.8
 .. _decouple: https://github.com/henriquebastos/python-decouple
 .. _envparse: https://github.com/rconradharris/envparse
 .. _dynaconf: https://github.com/rochacbruno/dynaconf
+
+.. _MIT license: https://opensource.org/licenses/MIT
