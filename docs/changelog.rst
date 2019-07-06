@@ -6,7 +6,10 @@ Changelog
 `Unreleased`_
 -------------
 
- - Added retry for Vault backends
+Added
+~~~~~
+
+ - Retries for Vault backends. `#12`_
 
 0.6.0 - 2019-06-30
 ------------------
@@ -14,3 +17,5 @@ Changelog
 - Initial public release
 
 .. _Unreleased: https://github.com/kiwicom/konfetti/compare/0.6.0...HEAD
+
+.. _#12: https://github.com/kiwicom/konfetti/issues/12
