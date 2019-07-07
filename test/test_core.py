@@ -4,11 +4,14 @@ import sys
 from dotenv import load_dotenv
 import pytest
 
+from konfetti import env, vault
 from konfetti.core import import_config_module, Konfig
 from konfetti.exceptions import MissingError, SettingsNotLoadable, SettingsNotSpecified
 from konfetti.vault import VaultBackend
 
 pytestmark = [pytest.mark.usefixtures("settings")]
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_simple_var_access(config):
@@ -157,6 +160,49 @@ def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
         "WHOLE_SECRET": {"DECIMAL": "1.3", "IS_SECRET": True, "SECRET": "value"},
         "DICTIONARY": {"static": 1, "env": True, "vault": "value"},
     }
+
+
+def test_from_object(vault_prefix, vault_addr, vault_token):
+    class Test:
+        VALUE = 42
+        VAULT_ADDR = env("VAULT_ADDR")
+        VAULT_TOKEN = env("VAULT_TOKEN")
+        SECRET = vault("path/to")["SECRET"]
+
+    config = Konfig.from_object(Test, vault_backend=VaultBackend(vault_prefix))
+    assert config.asdict() == {"VALUE": 42, "SECRET": "value", "VAULT_ADDR": vault_addr, "VAULT_TOKEN": vault_token}
+
+
+def test_from_mapping():
+    config = Konfig.from_mapping({"VALUE": 42})
+    assert config.asdict() == {"VALUE": 42}
+
+
+def test_from_string(vault_prefix, vault_addr, vault_token):
+    config = Konfig.from_object("test_app.settings.subset", vault_backend=VaultBackend(vault_prefix))
+    assert config.asdict() == {
+        "DEBUG": True,
+        "SECRET": "value",
+        "KEY": "value",
+        "VAULT_ADDR": vault_addr,
+        "VAULT_TOKEN": vault_token,
+        "NESTED_SECRET": "what?",
+        "WHOLE_SECRET": {"DECIMAL": "1.3", "IS_SECRET": True, "SECRET": "value"},
+        "DICTIONARY": {"static": 1, "env": True, "vault": "value"},
+    }
+
+
+def test_from_json(vault_prefix):
+    path = os.path.join(HERE, "test_app/settings/config.json")
+    config = Konfig.from_json(path, vault_backend=VaultBackend(vault_prefix))
+    assert config.asdict() == {"VALUE": "from json", "SECRET": 42}
+
+
+def test_single_file():
+    """Config object is defined in the same settings module."""
+    from test_app.settings.single import config
+
+    assert config.asdict() == {"DEBUG": True, "KEY": "value"}
 
 
 def test_vault_override_variables(monkeypatch, vault_prefix):

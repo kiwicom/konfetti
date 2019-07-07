@@ -1,3 +1,4 @@
+import json
 import sys
 from collections import OrderedDict
 from functools import wraps
@@ -14,7 +15,7 @@ from .vault.base import BaseVaultBackend
 from .laziness import LazyVariable
 from .log import core_logger
 from . import exceptions
-from ._compat import class_types
+from ._compat import class_types, string_types
 from .environ import EnvVariable
 from .utils import import_string, iscoroutinefunction, rebuild_dict
 from .vault import VaultVariable
@@ -44,6 +45,10 @@ def get_config_option_names(module):
     return [attr_name for attr_name in dir(module) if attr_name.isupper()]
 
 
+def default_loader(konfig):
+    return import_config_module(konfig.config_variable_name)
+
+
 @attr.s(slots=True)
 class Konfig(object):
     """Configuration holder."""
@@ -56,11 +61,44 @@ class Konfig(object):
     # Forbids overriding with options that are not defined in the config module
     strict_override = attr.ib(default=True, type=bool)
     config_variable_name = attr.ib(default="KONFETTI_SETTINGS", type=str)
+    loader = attr.ib(default=default_loader)
     _initialized = attr.ib(type=bool, init=False, default=False)
     _dotenv_loaded = attr.ib(type=bool, init=False, default=False)
     _conf = attr.ib(init=False, default=None)
     _vault = attr.ib(init=False, default=None)
     _config_overrides = attr.ib(init=False, type="OrderedDict[str, Dict]", factory=OrderedDict)
+
+    @classmethod
+    def from_object(cls, obj, **kwargs):
+        """Create a config from the given object or an importable string."""
+        if isinstance(obj, string_types):
+
+            def loader(konfig):
+                return import_string(obj)
+
+        else:
+
+            def loader(konfig):
+                return obj
+
+        return cls(loader=loader, **kwargs)
+
+    @classmethod
+    def from_mapping(cls, mapping, **kwargs):
+        """Create a config from the given mapping."""
+        obj = type("Config", (), mapping)
+        return cls.from_object(obj, **kwargs)
+
+    @classmethod
+    def from_json(cls, path, loads=json.loads, **kwargs):
+        """Create a config from the given path to JSON file."""
+
+        def loader(konfig):
+            with open(path) as fd:
+                mapping = loads(fd.read())
+            return type("Config", (), mapping)
+
+        return cls(loader=loader, **kwargs)
 
     def _setup(self):
         # type: () -> None
@@ -70,7 +108,7 @@ class Konfig(object):
         """
         if self._initialized:
             return
-        self._conf = import_config_module(self.config_variable_name)
+        self._conf = self.loader(self)
         self._initialized = True
         core_logger.info("Configuration loaded")
 

@@ -67,6 +67,30 @@ discover your settings module, in the case above:
 
 ``export KONFETTI_SETTINGS=app_name.settings.production``
 
+Alternatively the access point could be initiated from an object, importable string, mapping or a JSON file.
+
+.. code:: python
+
+   class TestSettings:
+       VALUE = "secret"
+   config = Konfig.from_object(TestSettings, ...)
+
+.. code:: python
+
+   config = Konfig.from_object("path.to.settings", ...)
+
+   # If the config is in the same module
+   SECRET = vault("/path/to")["secret"]
+   config = Konfig.from_object(__name__, ...)
+
+.. code:: python
+
+   config = Konfig.from_mapping({"SECRET": 42}, ...)
+
+.. code:: python
+
+   config = Konfig.from_json("/path/to.json")
+
 Usage
 ^^^^^
 
