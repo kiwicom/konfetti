@@ -95,4 +95,4 @@ def mocked_import_config_module(mocker):
     module = ModuleType("fake")
     module.EXAMPLE = "test"
     module.SOMETHING = "else"
-    return mocker.patch("konfetti.core.import_config_module", return_value=module)
+    return mocker.patch("konfetti.loaders.import_config_module", return_value=module)

@@ -6,4 +6,4 @@ try:
     string_types = (unicode, str)  # pylint: disable=undefined-variable
 except ImportError:
     class_types = (type,)  # type: ignore
-    string_types = (str,)
+    string_types = (str,)  # type: ignore

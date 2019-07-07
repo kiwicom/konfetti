@@ -1,8 +1,11 @@
 import inspect
+import os
 from types import ModuleType
 
 # Ignore PyImportSortBear, PyUnusedCodeBear
 from typing import Dict, Any
+
+from . import exceptions
 
 # This function is not defined for Python < 3.5
 iscoroutinefunction = getattr(inspect, "iscoroutinefunction", lambda f: False)
@@ -21,6 +24,24 @@ def import_string(path):
     parents, module = path.rsplit(".", 1)
     imported = __import__(parents, fromlist=[module])
     return getattr(imported, module)
+
+
+def import_config_module(config_variable_name):
+    # type: (str) -> ModuleType
+    """Import the given module."""
+    path = os.getenv(config_variable_name)
+    if not path:
+        raise exceptions.SettingsNotSpecified(
+            "The environment variable `{}` is not set or empty "
+            "and as such configuration could not be "
+            "loaded. Set this variable and make it "
+            "point to a configuration file".format(config_variable_name)
+        )
+    try:
+        return import_string(path)
+    except (ImportError, ValueError):
+        # ValueError happens when import string ends with a dot
+        raise exceptions.SettingsNotLoadable("Unable to load configuration file `{}`".format(path))
 
 
 def flatten_dict(dictionary):
