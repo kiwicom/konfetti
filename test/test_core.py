@@ -5,9 +5,7 @@ from dotenv import load_dotenv
 import pytest
 
 from konfetti import env, vault
-from konfetti.core import ConfigHolder
-from konfetti.core import Konfig
-from konfetti.core import get_config_option_names
+from konfetti.core import get_config_option_names, Konfig
 from konfetti.exceptions import MissingError, SettingsNotLoadable, SettingsNotSpecified
 from konfetti.utils import import_config_module
 from konfetti.vault import VaultBackend
