@@ -48,8 +48,26 @@ convert given variable from a string to the desired type:
 
    VARIABLE = env("VARIABLE_NAME", default=42, cast=int)
 
-You can pass any callable as ``cast``. If there is a need to use the
-environment variable immediately, it could be evaluated via ``str`` call
+You can pass any callable as ``cast``. ``list``, ``tuple``, ``set`` and ``frozenset`` will
+recognize comma separated values:
+
+.. code:: python
+
+   LIST = env("LIST", cast=list)
+   # 1,2,3
+   In [1]: config.LIST
+   ["1", "2", "3"]
+
+Those container types accept also ``subcast`` that will be applied to each element of the container:
+
+.. code:: python
+
+   LIST = env("LIST", cast=list, subcast=int)
+   # 1,2,3
+   In [1]: config.LIST
+   [1, 2, 3]
+
+If there is a need to use the environment variable immediately, it could be evaluated via ``str`` call
 (other ways could be added on demand):
 
 .. code:: python
