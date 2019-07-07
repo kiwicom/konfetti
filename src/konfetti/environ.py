@@ -6,7 +6,7 @@ from typing import Any, Callable, Union  # pylint: disable=unused-import
 
 import attr
 
-from .mixins import CastableMixin, validate_cast, DefaultMixin
+from .mixins import CastableMixin, validate_cast, DefaultMixin, CONTAINER_TYPES
 from .utils import NOT_SET
 
 
@@ -17,6 +17,7 @@ class EnvVariable(DefaultMixin, CastableMixin):
     name = attr.ib(type=str, validator=attr.validators.instance_of(str))
     default = attr.ib(default=NOT_SET)
     cast = attr.ib(default=NOT_SET, validator=validate_cast)
+    subcast = attr.ib(default=NOT_SET, validator=validate_cast)
 
     @name.validator
     def check_name(self, attribute, value):
@@ -25,16 +26,25 @@ class EnvVariable(DefaultMixin, CastableMixin):
         if "\x00" in value:
             raise ValueError("Environment variable name contains null bytes - '\\x00'")
 
+    @subcast.validator
+    def check_subcast(self, attribute, value):
+        if value is not NOT_SET and self.cast not in CONTAINER_TYPES:
+            allowed_type_names = [option.__name__ for option in CONTAINER_TYPES]
+            raise ValueError(
+                "`subcast` is only available when `cast` is one of these options: {}".format(allowed_type_names)
+            )
+
     @classmethod
     def env(
         cls,
         name,  # type: str
         default=NOT_SET,  # type: Any
         cast=NOT_SET,  # type: Union[object, Callable]
+        subcast=NOT_SET,  # type: Union[object, Callable]
     ):
         # type: (...) -> EnvVariable
         """Define a config option that will look for it's value in `os.environ`."""
-        return cls(name=name, default=default, cast=cast)
+        return cls(name=name, default=default, cast=cast, subcast=subcast)
 
     def __str__(self):
         """Evaluating the option could be helpful if some other options depend on this one.

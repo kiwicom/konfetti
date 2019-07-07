@@ -1,6 +1,8 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any
+
+# Ignore PyImportSortBear, PyUnusedCodeBear
+from typing import Any, Callable, Union, List, Tuple, Set
 import warnings
 
 from . import exceptions
@@ -17,6 +19,7 @@ _BOOLEANS = {
     "off": False,
     "": False,
 }
+CONTAINER_TYPES = (list, tuple, set, frozenset)
 
 
 def _cast_boolean(value):
@@ -31,19 +34,29 @@ def _cast_boolean(value):
         raise ValueError("Not a boolean: `{}`".format(value))
 
 
+def _cast_container(value, cast, subcast):
+    # type: (str, Callable, Callable) -> Union[List, Tuple, Set]
+    values = value.split(",")
+    if subcast is not NOT_SET:
+        values = map(subcast, values)
+    return cast(values)
+
+
 def validate_cast(self, attribute, value):
     if value is not NOT_SET and not callable(value):
         raise TypeError("'cast' must be callable")
 
 
 class CastableMixin(object):
-    def _cast(self, value):
+    def _cast(self, value):  # pylint: disable=too-many-return-statements
         # type: (Any) -> Any
         """Cast value to specified type if needed."""
         if self.cast is NOT_SET:  # type: ignore
             return value
         if self.cast is bool:  # type: ignore
             return _cast_boolean(value)
+        if self.cast in CONTAINER_TYPES:  # type: ignore
+            return _cast_container(value, self.cast, self.subcast)  # type: ignore
         if self.cast is datetime:  # type: ignore
             return datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
         if self.cast is date:  # type: ignore

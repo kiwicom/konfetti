@@ -60,6 +60,24 @@ def test_cast_not_callable():
 
 
 @pytest.mark.parametrize(
+    "kwargs, expected", (({"cast": list}, ["1", "2", "3", "4"]), ({"cast": list, "subcast": int}, [1, 2, 3, 4]))
+)
+def test_cast_list(config, monkeypatch, kwargs, expected):
+    config.extend_with_object({"LIST": env("LIST", **kwargs)})
+    monkeypatch.setenv("LIST", "1,2,3,4")
+    assert config.LIST == expected
+
+
+def test_subcast_error():
+    with pytest.raises(
+        ValueError,
+        match=r"`subcast` is only available when `cast` is one of these options: "
+        r"\['list', 'tuple', 'set', 'frozenset'\]",
+    ):
+        env("LIST", cast=int, subcast=int)
+
+
+@pytest.mark.parametrize(
     "name, exc_type, message",
     (
         (1, TypeError, "'name' must be "),
