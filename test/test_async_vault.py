@@ -151,16 +151,13 @@ async def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
 
 async def test_asdict_shortcut(vault_prefix, vault_addr, vault_token):
     # If there are no coroutines - nothing should be awaited
-    config = Konfig(vault_backend=AsyncVaultBackend(vault_prefix))
 
     class TestSettings:
         SECRET = 1
         VAULT_ADDR = env("VAULT_ADDR")
         VAULT_TOKEN = env("VAULT_TOKEN")
 
-    config._conf = TestSettings
-    config._initialized = True
-
+    config = Konfig.from_object(TestSettings, vault_backend=AsyncVaultBackend(vault_prefix))
     assert await config.asdict() == {"SECRET": 1, "VAULT_ADDR": vault_addr, "VAULT_TOKEN": vault_token}
 
 

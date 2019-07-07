@@ -10,6 +10,7 @@ Added
 ~~~~~
 
  - Retries for Vault backends. `#12`_
+ - Alternative constructors for ``Konfig``
 
 0.6.0 - 2019-06-30
 ------------------
