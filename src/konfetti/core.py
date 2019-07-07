@@ -2,8 +2,6 @@ import json
 import sys
 from collections import OrderedDict
 from functools import wraps
-import os
-from types import ModuleType
 
 # Ignore PyImportSortBear, PyUnusedCodeBear
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -14,39 +12,57 @@ from dotenv import load_dotenv
 from .vault.base import BaseVaultBackend
 from .laziness import LazyVariable
 from .log import core_logger
-from . import exceptions
-from ._compat import class_types, string_types
+from . import exceptions, loaders
+from ._compat import class_types
 from .environ import EnvVariable
-from .utils import import_string, iscoroutinefunction, rebuild_dict
+from .utils import iscoroutinefunction, rebuild_dict, NOT_SET
 from .vault import VaultVariable
 
 
-def import_config_module(config_variable_name):
-    # type: (str) -> ModuleType
-    """Import the given module."""
-    path = os.getenv(config_variable_name)
-    if not path:
-        raise exceptions.SettingsNotSpecified(
-            "The environment variable `{}` is not set or empty "
-            "and as such configuration could not be "
-            "loaded. Set this variable and make it "
-            "point to a configuration file".format(config_variable_name)
-        )
-    try:
-        return import_string(path)
-    except (ImportError, ValueError):
-        # ValueError happens when import string ends with a dot
-        raise exceptions.SettingsNotLoadable("Unable to load configuration file `{}`".format(path))
-
-
 def get_config_option_names(module):
-    # type: (ModuleType) -> List[str]
+    # type: (ConfigHolder) -> List[str]
     """Get all configuration option names defined in the given module."""
     return [attr_name for attr_name in dir(module) if attr_name.isupper()]
 
 
-def default_loader(konfig):
-    return import_config_module(konfig.config_variable_name)
+@attr.s(slots=True)
+class ConfigHolder(object):
+    konfig = attr.ib()
+    sources = attr.ib(type=List, factory=list)
+
+    def __iter__(self):
+        # newer config sources have higher precedence
+        for source in reversed(self.sources):
+            yield source.get(self.konfig)
+
+    def __dir__(self):
+        output = set()
+        for source in self:
+            output |= set(dir(source))
+        return list(output)
+
+    def __getattr__(self, item):
+        for source in self:
+            try:
+                return getattr(source, item)
+            except AttributeError:
+                pass
+        raise AttributeError
+
+    def append(self, item):
+        self.sources.append(Lazy(item))
+
+
+@attr.s(slots=True)
+class Lazy(object):
+    closure = attr.ib()
+    value = attr.ib(init=False, default=NOT_SET)
+
+    def get(self, *args, **kwargs):
+        if self.value is NOT_SET:
+            self.value = self.closure(*args, **kwargs)
+            core_logger.info("Configuration loaded")
+        return self.value
 
 
 @attr.s(slots=True)
@@ -61,56 +77,35 @@ class Konfig(object):
     # Forbids overriding with options that are not defined in the config module
     strict_override = attr.ib(default=True, type=bool)
     config_variable_name = attr.ib(default="KONFETTI_SETTINGS", type=str)
-    loader = attr.ib(default=default_loader)
-    _initialized = attr.ib(type=bool, init=False, default=False)
+    loader = attr.ib(factory=loaders.default_loader_factory)
     _dotenv_loaded = attr.ib(type=bool, init=False, default=False)
-    _conf = attr.ib(init=False, default=None)
+    _conf = attr.ib(init=False)
     _vault = attr.ib(init=False, default=None)
     _config_overrides = attr.ib(init=False, type="OrderedDict[str, Dict]", factory=OrderedDict)
 
+    def __attrs_post_init__(self):
+        self._conf = ConfigHolder(self)
+        self._conf.append(self.loader)
+
     @classmethod
     def from_object(cls, obj, **kwargs):
-        """Create a config from the given object or an importable string."""
-        if isinstance(obj, string_types):
-
-            def loader(konfig):
-                return import_string(obj)
-
-        else:
-
-            def loader(konfig):
-                return obj
-
-        return cls(loader=loader, **kwargs)
-
-    @classmethod
-    def from_mapping(cls, mapping, **kwargs):
-        """Create a config from the given mapping."""
-        obj = type("Config", (), mapping)
-        return cls.from_object(obj, **kwargs)
+        """Create a config from the given object, mapping or an importable string."""
+        factory = loaders.get_loader_factory(obj)
+        return cls(loader=factory, **kwargs)
 
     @classmethod
     def from_json(cls, path, loads=json.loads, **kwargs):
         """Create a config from the given path to JSON file."""
+        return cls(loader=loaders.json_loader_factory(path, loads), **kwargs)
 
-        def loader(konfig):
-            with open(path) as fd:
-                mapping = loads(fd.read())
-            return type("Config", (), mapping)
+    def extend_with_json(self, path, loads=json.loads):
+        """Extend the config with data from the JSON file."""
+        self._conf.append(loaders.json_loader_factory(path, loads))
 
-        return cls(loader=loader, **kwargs)
-
-    def _setup(self):
-        # type: () -> None
-        """Load configuration module.
-
-        No-op if the module is already loaded.
-        """
-        if self._initialized:
-            return
-        self._conf = self.loader(self)
-        self._initialized = True
-        core_logger.info("Configuration loaded")
+    def extend_with_object(self, obj):
+        """Extend the config with the given mapping."""
+        factory = loaders.get_loader_factory(obj)
+        self._conf.append(factory)
 
     def _load_dotenv(self):
         # type: () -> None
@@ -129,7 +124,6 @@ class Konfig(object):
         """Custom settings for overriding."""
         core_logger.debug("Start overriding with %s", kwargs)
         if self.strict_override:
-            self._setup()
             self._validate_override(kwargs)
         # check for intersecting keys? maybe forbid merging if keys are intersecting
         self._config_overrides[override_id] = kwargs
@@ -204,7 +198,6 @@ class Konfig(object):
     def _get_from_config(self, item):
         # type: (str) -> Any
         """Get given option from actual config."""
-        self._setup()
         try:
             obj = getattr(self._conf, item)
         except AttributeError:
@@ -232,7 +225,6 @@ class Konfig(object):
         value = self._get_from_override(item)
         if value is not None:
             return True
-        self._setup()
         return bool(getattr(self._conf, item, False))
 
     def get_secret(self, path):
@@ -264,7 +256,6 @@ class Konfig(object):
 
         Depending on the Vault backend could return an awaitable object.
         """
-        self._setup()
         keys = get_config_option_names(self._conf)
         result = {key: getattr(self, key) for key in keys}
 
@@ -304,10 +295,9 @@ class _Vault(object):
         # type: () -> Dict[str, Dict[str, Any]]
         """To simplify overriding process it could be helpful to look at examples."""
         if not self._overrides:
-            self._config._setup()
             vault_variables = {}  # type: Dict[str, Dict[str, Any]]
             # Traverse via config content
-            for attr_name in vars(self._config._conf):
+            for attr_name in dir(self._config._conf):
                 value = getattr(self._config._conf, attr_name)
                 # Filter vault variables
                 if not attr_name.startswith("_") and isinstance(value, VaultVariable):

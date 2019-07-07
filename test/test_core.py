@@ -5,8 +5,11 @@ from dotenv import load_dotenv
 import pytest
 
 from konfetti import env, vault
-from konfetti.core import import_config_module, Konfig
+from konfetti.core import ConfigHolder
+from konfetti.core import Konfig
+from konfetti.core import get_config_option_names
 from konfetti.exceptions import MissingError, SettingsNotLoadable, SettingsNotSpecified
+from konfetti.utils import import_config_module
 from konfetti.vault import VaultBackend
 
 pytestmark = [pytest.mark.usefixtures("settings")]
@@ -174,7 +177,7 @@ def test_from_object(vault_prefix, vault_addr, vault_token):
 
 
 def test_from_mapping():
-    config = Konfig.from_mapping({"VALUE": 42})
+    config = Konfig.from_object({"VALUE": 42})
     assert config.asdict() == {"VALUE": 42}
 
 
@@ -196,6 +199,29 @@ def test_from_json(vault_prefix):
     path = os.path.join(HERE, "test_app/settings/config.json")
     config = Konfig.from_json(path, vault_backend=VaultBackend(vault_prefix))
     assert config.asdict() == {"VALUE": "from json", "SECRET": 42}
+
+
+def test_extend():
+    from test_app.settings.single import config
+
+    path = os.path.join(HERE, "test_app/settings/config.json")
+    config.extend_with_json(path)
+    assert config.asdict() == {"DEBUG": True, "KEY": "value", "VALUE": "from json", "SECRET": 42}
+
+
+def test_extend_with_object():
+    from test_app.settings.single import config
+
+    config.extend_with_object({"FOO": "bar"})
+    assert config.asdict() == {"DEBUG": True, "KEY": "value", "FOO": "bar"}
+
+
+def test_config_options_uniqueness(config):
+    """Config option names should not e duplicated from different configs."""
+    config.extend_with_object({"NEW": 1})
+    config.extend_with_object({"NEW": 2})
+    config_options = get_config_option_names(config._conf)
+    assert len(set(config_options)) == len(config_options)
 
 
 def test_single_file():

@@ -463,6 +463,22 @@ manager/decorator approach and automatically rollbacks changes made:
 **NOTE**. It is forbidden to create two fixtures from the same config
 instances.
 
+Extending configuration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes configuration is distributed to multiple places - python modules, JSON files, etc. To handle
+everything seamlessly there is a couple of methods:
+
+
+.. code:: python
+
+   config = Konfig()
+   config.extend_with_object("path.to.module")
+   config.extend_with_object({"KEY": "value"})
+   config.extend_with_json("/path/to.json")
+
+Importable strings and JSON files will be loaded lazily on the first access.
+
 Extras
 ~~~~~~
 
