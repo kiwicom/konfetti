@@ -14,14 +14,12 @@ from .utils import NOT_SET
 class EnvVariable(DefaultMixin, CastableMixin):
     """Environment variable holder."""
 
-    name = attr.ib(type=str)
+    name = attr.ib(type=str, validator=attr.validators.instance_of(str))
     default = attr.ib(default=NOT_SET)
     cast = attr.ib(default=NOT_SET, validator=validate_cast)
 
     @name.validator
     def check_name(self, attribute, value):
-        if not isinstance(value, str):
-            raise TypeError("'name' must be <class 'str'> (got 1 that is a {})".format(type(value)))
         if not value:
             raise ValueError("Environment variable name should not be an empty string")
         if "\x00" in value:

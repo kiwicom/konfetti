@@ -62,7 +62,7 @@ def test_cast_not_callable():
 @pytest.mark.parametrize(
     "name, exc_type, message",
     (
-        (1, TypeError, "'name' must be <class 'str'>"),
+        (1, TypeError, "'name' must be "),
         ("", ValueError, "Environment variable name should not be an empty string"),
         ("\x00bla", ValueError, "Environment variable name contains null bytes"),
     ),
