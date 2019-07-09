@@ -4,21 +4,32 @@ sudo: false
 language: python
 cache: pip
 
+stages:
+  - linters
+  - tests
+
 matrix:
   include:
-    - python: 3.7
+    - stage: linters
+      python: 3.7
       env: TOX_ENV=pylint
-    - python: 3.7
+    - stage: linters
+      python: 3.7
       env: TOX_ENV=mypy
-    - python: 3.7
+    - stage: linters
+      python: 3.7
       env: TOX_ENV=black
-    - python: 2.7
+    - stage: tests
+      python: 2.7
       env: TOX_ENV=py27-tests
-    - python: 3.5
+    - stage: tests
+      python: 3.5
       env: TOX_ENV=py35-tests
-    - python: 3.6
+    - stage: tests
+      python: 3.6
       env: TOX_ENV=py36-tests
-    - python: 3.7
+    - stage: tests
+      python: 3.7
       env: TOX_ENV=py37-tests
 
 services:
