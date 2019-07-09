@@ -4,7 +4,7 @@ from collections import OrderedDict
 from functools import wraps
 
 # Ignore PyImportSortBear, PyUnusedCodeBear
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Set
 
 import attr
 from dotenv import load_dotenv
@@ -36,7 +36,7 @@ class ConfigHolder(object):
             yield source.get(self.konfig)
 
     def __dir__(self):
-        output = set()
+        output = set()  # type: Set[Any]
         for source in self:
             output |= set(dir(source))
         return list(output)
