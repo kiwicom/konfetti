@@ -38,7 +38,7 @@ def _cast_container(value, cast, subcast):
     # type: (str, Callable, Callable) -> Union[List, Tuple, Set]
     values = value.split(",")
     if subcast is not NOT_SET:
-        values = map(subcast, values)
+        values = map(subcast, values)  # type: ignore
     return cast(values)
 
 
