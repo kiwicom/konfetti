@@ -15,6 +15,7 @@ class BaseVaultBackend(object):
     max_retries = attr.ib(type=int, default=3, validator=attr.validators.instance_of(int))
     max_retry_time = attr.ib(type=int, default=15, validator=attr.validators.instance_of(int))
     retry = attr.ib(default=None)
+    _token = attr.ib(init=False, type=Union[str, object], default=NOT_SET)
 
     is_async = None  # type: Optional[bool]
 

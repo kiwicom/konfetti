@@ -9,6 +9,7 @@ from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt
 from konfetti import env, Konfig
 from konfetti._async import make_async_callback, make_simple_coro
 from konfetti.exceptions import KonfettiError, MissingError, SecretKeyMissing
+from konfetti.utils import NOT_SET
 from konfetti.vault import AsyncVaultBackend
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.async_vault, pytest.mark.usefixtures("env", "vault_data")]
@@ -183,3 +184,46 @@ async def test_retry_object(vault_prefix, mocker):
         await config.SECRET
     assert m.called is True
     assert m.call_count == 2
+
+
+@pytest.mark.parametrize("token", ("token_removed", "token_expired"))
+async def test_userpass(config, monkeypatch, token):
+    if token == "token_removed":
+        monkeypatch.delenv("VAULT_TOKEN")
+    else:
+        monkeypatch.setenv("VAULT_TOKEN", token)
+    monkeypatch.setenv("VAULT_USERNAME", "test_user")
+    monkeypatch.setenv("VAULT_PASSWORD", "test_password")
+    assert await config.SECRET == "value"
+
+
+async def test_userpass_cache(config_with_cached_vault, vault_prefix, mocker, monkeypatch):
+    monkeypatch.delenv("VAULT_TOKEN")
+    monkeypatch.setenv("VAULT_USERNAME", "test_user")
+    monkeypatch.setenv("VAULT_PASSWORD", "test_password")
+    await test_cold_cache(config_with_cached_vault, vault_prefix, mocker)
+    vault = mocker.patch("aiohttp.ClientSession.get")
+    # Cache is warmed and contains the secret
+    assert await config_with_cached_vault.get_secret("/path/to") == SECRET_DATA
+    assert config_with_cached_vault.vault_backend.cache[vault_prefix + "/path/to"] == SECRET_DATA
+
+    assert not vault.called
+
+
+async def test_userpass_token_cache(config, monkeypatch, mocker):
+    monkeypatch.delenv("VAULT_TOKEN")
+    monkeypatch.setenv("VAULT_USERNAME", "test_user")
+    monkeypatch.setenv("VAULT_PASSWORD", "test_password")
+    # First time access / auth
+    auth = mocker.patch("konfetti.AsyncVaultBackend._auth_userpass", wraps=config.vault_backend._auth_userpass)
+    assert config.vault_backend._token is NOT_SET
+    assert await config.SECRET == "value"
+    assert auth.called is True
+    assert auth.call_count == 1
+    assert config.vault_backend._token is not NOT_SET
+    # Second time access / no auth
+    auth = mocker.patch("konfetti.AsyncVaultBackend._auth_userpass", wraps=config.vault_backend._auth_userpass)
+    first_token = config.vault_backend._token
+    assert await config.IS_SECRET is True
+    assert auth.called is False
+    assert config.vault_backend._token == first_token

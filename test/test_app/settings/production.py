@@ -41,3 +41,5 @@ def lazy_property(config):
 
 VAULT_ADDR = env("VAULT_ADDR")
 VAULT_TOKEN = env("VAULT_TOKEN")
+VAULT_USERNAME = env("VAULT_USERNAME", default=None)
+VAULT_PASSWORD = env("VAULT_PASSWORD", default=None)
