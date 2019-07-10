@@ -3,6 +3,7 @@ from decimal import Decimal
 from io import BytesIO
 import sys
 
+import hvac
 import pytest
 from requests import RequestException
 from tenacity import retry_if_exception_type, Retrying, stop_after_attempt
@@ -90,9 +91,14 @@ def test_disable_secrets(config, monkeypatch, action):
         action(config)
 
 
-def test_get_secret_without_vault_credentials(config, monkeypatch):
-    monkeypatch.delenv("VAULT_ADDR")
-    monkeypatch.delenv("VAULT_TOKEN")
+@pytest.mark.parametrize(
+    "variables", (("VAULT_ADDR",), ("VAULT_TOKEN", "VAULT_USERNAME"), ("VAULT_TOKEN", "VAULT_PASSWORD"))
+)
+def test_get_secret_without_vault_credentials(config, monkeypatch, variables):
+    monkeypatch.setenv("VAULT_USERNAME", "test_user")
+    monkeypatch.setenv("VAULT_PASSWORD", "test_password")
+    for env_var in variables:
+        monkeypatch.delenv(env_var)
     with pytest.raises(MissingError, match="""Can't access secret `/path/to` due"""):
         config.get_secret("/path/to")
 
@@ -256,3 +262,43 @@ def test_retry_object(vault_prefix, mocker):
         config.SECRET
     assert m.called is True
     assert m.call_count == 2
+
+
+@pytest.mark.parametrize("token", ("token_removed", "token_expired"))
+def test_userpass(config, monkeypatch, token):
+    if token == "token_removed":
+        monkeypatch.delenv("VAULT_TOKEN")
+    else:
+        monkeypatch.setenv("VAULT_TOKEN", token)
+    monkeypatch.setenv("VAULT_USERNAME", "test_user")
+    monkeypatch.setenv("VAULT_PASSWORD", "test_password")
+    assert config.SECRET == "value"
+
+
+def test_userpass_cache(config_with_cached_vault, vault_prefix, mocker, monkeypatch):
+    monkeypatch.delenv("VAULT_TOKEN")
+    monkeypatch.setenv("VAULT_USERNAME", "test_user")
+    monkeypatch.setenv("VAULT_PASSWORD", "test_password")
+    test_cold_cache(config_with_cached_vault, vault_prefix)
+    vault = mocker.patch("hvac.Client.read")
+    # Cache is warmed and contains the secret
+    assert config_with_cached_vault.get_secret("/path/to") == SECRET_DATA
+    assert config_with_cached_vault.vault_backend.cache[vault_prefix + "/path/to"] == SECRET_DATA
+
+    assert not vault.called
+
+
+def test_userpass_token_cache(config, monkeypatch, mocker):
+    monkeypatch.delenv("VAULT_TOKEN")
+    monkeypatch.setenv("VAULT_USERNAME", "test_user")
+    monkeypatch.setenv("VAULT_PASSWORD", "test_password")
+    # First time access / auth
+    assert config.vault_backend._token is NOT_SET
+    assert config.SECRET == "value"
+    assert config.vault_backend._token is not NOT_SET
+    # Second time access / no auth
+    auth = mocker.patch("hvac.Client.auth_userpass")
+    first_token = config.vault_backend._token
+    assert config.IS_SECRET is True
+    assert auth.called is False
+    assert config.vault_backend._token == first_token

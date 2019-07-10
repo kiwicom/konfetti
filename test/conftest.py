@@ -77,6 +77,17 @@ def vault_data(vault_prefix):
     # docker run -p 8200:8200 -d --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID=test_root_token' vault:0.9.6
 
     vault = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN)
+
+    # Enable userpass auth method only if it is disabled
+    try:
+        vault.sys.enable_auth_method("userpass")
+        vault.sys.create_or_update_policy(
+            name="secret-reader", policy="""path "secret/*" {capabilities = ["read", "list"]}"""
+        )
+        vault.create_userpass(username="test_user", password="test_password", policies="secret-reader")
+    except hvac.exceptions.InvalidRequest as exc:
+        pass
+
     data = {
         vault_prefix + "/path/to": {"SECRET": "value", "IS_SECRET": True, "DECIMAL": "1.3"},
         vault_prefix + "/path/to/cast": {"DECIMAL": 1.3, "DATE": "2019-01-25", "DATETIME": "2019-01-25T14:35:05"},

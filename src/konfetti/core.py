@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Set
 import attr
 from dotenv import load_dotenv
 
+from .exceptions import MissingError
 from .vault.base import BaseVaultBackend
 from .laziness import LazyVariable
 from .log import core_logger
@@ -246,8 +247,24 @@ class Konfig(object):
         # A closure is needed to avoid a need to evaluate VAULT_{ADDR,TOKEN} variables
         # before environment overriding was checked
         def closure():
-            # type: () -> Tuple[str, str]
-            return self.VAULT_ADDR, self.VAULT_TOKEN
+            # type: () -> Tuple[str, Optional[str], Optional[str], Optional[str]]
+            address = self.VAULT_ADDR
+
+            # Try to load token/credentials but raise exception only if both of them are missing
+            token = get_option("VAULT_TOKEN")
+            username = get_option("VAULT_USERNAME")
+            password = get_option("VAULT_PASSWORD")
+
+            if token is None and (username is None or password is None):
+                raise MissingError
+
+            return address, token, username, password
+
+        def get_option(name):
+            try:
+                return getattr(self, name)
+            except MissingError:
+                pass
 
         return obj.evaluate(self.vault_backend, closure)  # type: ignore
 

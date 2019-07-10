@@ -127,6 +127,22 @@ Each backend requires a ``prefix`` to be specified, the trailing /
 leading slashes don't matter, ``"your/prefix"`` will work the same as
 ``"/your/prefix/"``.
 
+There are two ways to provide access credentials:
+
+-  via ``VAULT_TOKEN`` environment variable for token-based auth method
+-  via ``VAULT_USERNAME`` and ``VAULT_PASSWORD`` environment variables for ``userpass`` auth method
+
+If both are provided, token will be tried first and ``userpass`` credentials next in case of expired token.
+
+Access credentials must be specified as a part of configuration.
+
+.. code:: python
+
+   # app_name/settings/production.py
+   VAULT_TOKEN = env("VAULT_TOKEN")
+   VAULT_USERNAME = env("VAULT_USERNAME")
+   VAULT_PASSWORD = env("VAULT_PASSWORD")
+
 .. _usage-1:
 
 Usage
