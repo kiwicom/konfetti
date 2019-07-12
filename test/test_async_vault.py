@@ -197,6 +197,12 @@ async def test_userpass(config, monkeypatch, token):
     assert await config.SECRET == "value"
 
 
+async def test_invalid_token(config, monkeypatch):
+    monkeypatch.setenv("VAULT_TOKEN", "invalid")
+    with pytest.raises(aiohttp.client_exceptions.ClientResponseError):
+        await config.SECRET
+
+
 async def test_userpass_cache(config_with_cached_vault, vault_prefix, mocker, monkeypatch):
     monkeypatch.delenv("VAULT_TOKEN")
     monkeypatch.setenv("VAULT_USERNAME", "test_user")

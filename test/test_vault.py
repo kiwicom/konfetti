@@ -275,6 +275,12 @@ def test_userpass(config, monkeypatch, token):
     assert config.SECRET == "value"
 
 
+def test_invalid_token(config, monkeypatch):
+    monkeypatch.setenv("VAULT_TOKEN", "invalid")
+    with pytest.raises(hvac.exceptions.Forbidden):
+        config.SECRET
+
+
 def test_userpass_cache(config_with_cached_vault, vault_prefix, mocker, monkeypatch):
     monkeypatch.delenv("VAULT_TOKEN")
     monkeypatch.setenv("VAULT_USERNAME", "test_user")
