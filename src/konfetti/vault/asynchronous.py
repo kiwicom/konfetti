@@ -57,7 +57,7 @@ class AsyncVaultBackend(BaseVaultBackend):
         try:
             content = await self._read_path(path, url, token)
         except aiohttp.client_exceptions.ClientResponseError as exc:
-            if exc.code == 403 and (username and password):
+            if exc.status == 403 and (username and password):
                 token = await self._auth_userpass(url, username, password)
                 self._token = token
                 content = await self._read_path(path, url, token)
@@ -78,10 +78,9 @@ class AsyncVaultBackend(BaseVaultBackend):
                 try:
                     response.raise_for_status()
                 except aiohttp.client_exceptions.ClientResponseError as exc:
-                    if exc.code == 404:
-                        pass
-                    else:
+                    if exc.status != 404:
                         raise exc
+
         if "data" not in content:
             raise exceptions.MissingError("Option `{}` is not present in Vault ({})".format(path, self.prefix))
         return content
