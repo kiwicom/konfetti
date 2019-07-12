@@ -51,6 +51,7 @@ class AsyncVaultBackend(BaseVaultBackend):
             if self._token is not NOT_SET:
                 token = self._token
             else:
+                vault_logger.debug("Retrieving a new token")
                 token = await self._auth_userpass(url, username, password)
                 self._token = token
 
@@ -58,6 +59,7 @@ class AsyncVaultBackend(BaseVaultBackend):
             content = await self._read_path(path, url, token)
         except aiohttp.client_exceptions.ClientResponseError as exc:
             if exc.status == 403 and (username and password):
+                vault_logger.debug("Token is invalid. Retrieving a new token")
                 token = await self._auth_userpass(url, username, password)
                 self._token = token
                 content = await self._read_path(path, url, token)
