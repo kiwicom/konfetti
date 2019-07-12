@@ -47,6 +47,7 @@ class VaultBackend(BaseVaultBackend):
             if self._token is not NOT_SET:
                 vault.auth.adapter.token = self._token
             else:
+                vault_logger.debug("Retrieving a new token")
                 vault.auth_userpass(username, password)
                 self._token = vault.auth.adapter.token
 
@@ -54,6 +55,7 @@ class VaultBackend(BaseVaultBackend):
             response = self.read_path(path, vault)
         except hvac.exceptions.Forbidden as exc:
             if username and password:
+                vault_logger.debug("Token is invalid. Retrieving a new token")
                 vault.auth_userpass(username, password)
                 self._token = vault.auth.adapter.token
                 response = self.read_path(path, vault)
