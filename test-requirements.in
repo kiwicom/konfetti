@@ -1,4 +1,5 @@
 coverage<4.4  # conflicts with Sonarqube
+django
 pytest
 pytest-asyncio; python_version >= '3.5'
 pytest-freezegun

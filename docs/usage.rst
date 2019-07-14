@@ -563,3 +563,18 @@ Or to check that they are defined:
 
    In [1]: "SECRET" in config
    True
+
+Django integration
+~~~~~~~~~~~~~~~~~~
+
+To magically convert ``django.conf.settings`` into konfetti config object, add this to the very end
+of your project settings module.
+
+.. code:: python
+
+   config = install(
+       __name__,
+       vault_backend=VaultBackend("your/prefix")
+   )
+
+Having this will allow the application to use settings, defined via ``vault``, ``env`` and other types from konfetti.
