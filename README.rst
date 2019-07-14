@@ -18,7 +18,8 @@ The interface design and features are heavily inspired by `decouple`_, `Django`_
 -  Lazy evaluation;
 -  Built-in environment variables support;
 -  Built-in async Vault access support;
--  Helpers for tests.
+-  Helpers for tests;
+-  Django integration.
 
 **Benefits of lazy evaluation**:
 
