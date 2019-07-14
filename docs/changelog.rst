@@ -9,11 +9,11 @@ Changelog
 Added
 ~~~~~
 
- - Retries for Vault backends. `#12`_
- - Alternative constructors for ``Konfig``
- - Add configuration extending. `#34`_
- - Add casting for container types. `#35`_
- - Add ``userpass`` authentication method for vault `#18`_
+- Retries for Vault backends. `#12`_
+- Alternative constructors for ``Konfig``
+- Add configuration extending. `#34`_
+- Add casting for container types. `#35`_
+- Add ``userpass`` authentication method for vault `#18`_
 
 0.6.0 - 2019-06-30
 ------------------
