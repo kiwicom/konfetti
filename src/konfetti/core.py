@@ -216,6 +216,8 @@ class Konfig(object):
         if isinstance(obj, LazyVariable):
             self._load_dotenv()
             return obj.evaluate(self)
+        if isinstance(obj, dict):
+            return self._evaluate_dict(obj)
         return obj
 
     def __contains__(self, item):
@@ -275,13 +277,14 @@ class Konfig(object):
         """
         keys = get_config_option_names(self._conf)
         result = {key: getattr(self, key) for key in keys}
+        return self._evaluate_dict(result)
 
+    def _evaluate_dict(self, obj):
         # Configuration dict could be multilevel and contain config variables, that should be evaluated
         # The basic strategy is to create a copy of the given dict with all options evaluated (+ coros awaited)
         # Why copy?
         # Because of call-by-reference for dicts - otherwise the original dictionary in the config module / class
         # will be modified
-
         def evaluate_option(value):
             if isinstance(value, (VaultVariable, EnvVariable, LazyVariable)):
                 value = self._evaluate(value)
@@ -290,8 +293,8 @@ class Konfig(object):
         if self.vault_backend and self.vault_backend.is_async:
             from ._async import async_process_dict
 
-            return async_process_dict(result, evaluate_option)
-        return rebuild_dict(result, evaluate_option)
+            return async_process_dict(obj, evaluate_option)
+        return rebuild_dict(obj, evaluate_option)
 
     @property
     def vault(self):

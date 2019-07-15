@@ -163,6 +163,12 @@ def test_asdict(monkeypatch, vault_prefix, vault_addr, vault_token):
     }
 
 
+def test_dictionary_access(monkeypatch, vault_prefix):
+    monkeypatch.setenv("KONFETTI_SETTINGS", "test_app.settings.subset")
+    config = Konfig(vault_backend=VaultBackend(vault_prefix))
+    assert config.DICTIONARY == {"static": 1, "env": True, "vault": "value"}
+
+
 def test_from_object(vault_prefix, vault_addr, vault_token):
     class Test:
         VALUE = 42
