@@ -18,6 +18,7 @@ Added
 - Add casting for container types. `#35`_
 - Add ``userpass`` authentication method for vault `#18`_
 - Django integration. `#31`_
+- Flask integration. `#32`_
 
 0.6.0 - 2019-06-30
 ------------------
@@ -32,3 +33,4 @@ Added
 .. _#31: https://github.com/kiwicom/konfetti/issues/31
 .. _#12: https://github.com/kiwicom/konfetti/issues/12
 .. _#18: https://github.com/kiwicom/konfetti/issues/18
+.. _#32: https://github.com/kiwicom/konfetti/issues/32
