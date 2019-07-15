@@ -49,8 +49,8 @@ class VaultVariable(CastableMixin):
                 return self._try_load_from_env(backend)
             except exceptions.MissingError:
                 pass
-        url, token, username, password = self._load_credentials(closure)
         self.validate_allowance_to_access_secrets()
+        url, token, username, password = self._load_credentials(closure)
         data = backend.load(self.path, url, token, username, password)
         if iscoroutine(data) or isgenerator(data):
             # To avoid syntax errors on Python 2.7
