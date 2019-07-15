@@ -107,6 +107,7 @@ class VaultVariable(CastableMixin):
 
     def __getitem__(self, item):
         # type: (str) -> VaultVariable
+        """Store all [key1][key2] path inside `self.keys`."""
         self.keys.append(item)
         return self
 
@@ -122,6 +123,7 @@ class VaultVariable(CastableMixin):
     @property
     def disabled(self):
         # type: () -> bool
+        """If secrets access is globally disabled."""
         # Move to some global config or we need to modify in runtime?
         return EnvVariable(SECRETS_DISABLED_VARIABLE, default=False, cast=bool).evaluate()
 
@@ -140,6 +142,7 @@ class VaultVariable(CastableMixin):
 
     @property
     def override_example(self):
+        """Provide an example for overriding the variable via environment."""
         if self.keys:
             # Add example value
             example = {}  # type: Dict[str, Dict[str, Any]]
