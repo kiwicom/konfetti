@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Any, Dict  # ignore: PyUnusedCodeBear
+from typing import Any, Dict, Optional  # ignore: PyUnusedCodeBear
 
 import attr
 
@@ -28,7 +28,7 @@ class VaultBackend(BaseVaultBackend):
     is_async = False
 
     def load(self, path, url, token, username, password):  # pylint: disable=too-many-arguments
-        # type: (str, str, str, str, str) -> Dict[str, Any]
+        # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Dict[str, Any]
 
         from requests.exceptions import RequestException
         from tenacity import Retrying
@@ -39,6 +39,7 @@ class VaultBackend(BaseVaultBackend):
 
     @cached_call
     def _call(self, path, url, token, username, password):  # pylint: disable=too-many-arguments
+        # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Any
         vault_logger.debug('Access "%s" in Vault', path)
         import hvac
 

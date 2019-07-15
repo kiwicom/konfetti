@@ -1,4 +1,5 @@
 from functools import wraps
+from typing import Any, Optional
 from urllib.parse import urljoin
 
 import attr
@@ -34,6 +35,7 @@ class AsyncVaultBackend(BaseVaultBackend):
     is_async = True
 
     async def load(self, path, url, token, username, password):  # pylint: disable=too-many-arguments
+        # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Any
         from aiohttp import ClientConnectionError
         from tenacity import AsyncRetrying
 
@@ -43,20 +45,21 @@ class AsyncVaultBackend(BaseVaultBackend):
 
     @cached_call
     async def _call(self, path, url, token, username, password):  # pylint: disable=too-many-arguments
+        # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Any
         """A call to the Vault server."""
         vault_logger.debug('Access "%s" in Vault', path)
         import aiohttp
 
         if not token and (username and password):
             if self._token is not NOT_SET:
-                token = self._token
+                token = self._token  # type: ignore
             else:
                 vault_logger.debug("Retrieving a new token")
                 token = await self._auth_userpass(url, username, password)
                 self._token = token
 
         try:
-            content = await self._read_path(path, url, token)
+            content = await self._read_path(path, url, token)  # type: ignore
         except aiohttp.client_exceptions.ClientResponseError as exc:
             if exc.status == 403 and (username and password):
                 vault_logger.debug("Token is invalid. Retrieving a new token")
@@ -69,6 +72,7 @@ class AsyncVaultBackend(BaseVaultBackend):
         return content["data"]
 
     async def _read_path(self, path, url, token):
+        # type: (str, str, str) -> Any
         import aiohttp
 
         url = _get_full_url(url, path)
@@ -89,6 +93,7 @@ class AsyncVaultBackend(BaseVaultBackend):
 
     @staticmethod
     async def _auth_userpass(url, username, password):
+        # type: (str, str, str) -> str
         import aiohttp
 
         params = {"password": password}
