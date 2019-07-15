@@ -30,6 +30,10 @@ class BaseVaultBackend(object):
 
     def _get_full_path(self, path):
         # type: (str) -> str
+        """Get full path to the secret.
+
+        Join prefix with the given path and cleanup leading & trailing slashes.
+        """
         if self.prefix is NOT_SET:
             return path.strip("/")
         return self.prefix.strip("/") + "/" + path.strip("/")  # type: ignore
