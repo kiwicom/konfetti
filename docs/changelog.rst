@@ -6,13 +6,16 @@ Changelog
 `Unreleased`_
 -------------
 
+`0.7.1`_ - 2019-07-17
+---------------------
+
 Fixed
 ~~~~~
 
 - Evaluation of config options that are dictionaries. `#47`_
 
 `0.7.0`_ - 2019-07-15
-------------------
+---------------------
 
 Added
 ~~~~~
@@ -32,6 +35,7 @@ Added
 
 .. _Unreleased: https://github.com/kiwicom/konfetti/compare/0.7.0...HEAD
 .. _0.7.0: https://github.com/kiwicom/konfetti/compare/0.6.0...0.7.0
+.. _0.7.1: https://github.com/kiwicom/konfetti/compare/0.7.0...0.7.1
 
 .. _#47: https://github.com/kiwicom/konfetti/issues/47
 .. _#35: https://github.com/kiwicom/konfetti/issues/35
