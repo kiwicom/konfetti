@@ -31,6 +31,7 @@ install:
 
 build:
 	pip install wheel
+	rm -rf dist
 	python setup.py bdist_wheel --universal
 
 release: build
