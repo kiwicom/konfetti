@@ -107,9 +107,23 @@ class VaultVariable(CastableMixin):
 
     def __getitem__(self, item):
         # type: (str) -> VaultVariable
-        """Store all [key1][key2] path inside `self.keys`."""
-        self.keys.append(item)
-        return self
+        """Create a copy of vault variable with extra key in `self.keys`.
+
+        Copying behavior provides better isolation of different variables and allows to reuse them safely, without
+        modifying the parent variable:
+
+        variable = vault("path/to")
+
+        class Test:
+            VAULT_ADDR = vault_addr
+            VAULT_TOKEN = vault_token
+            SECRET = variable["SECRET"]
+            IS_SECRET = variable["IS_SECRET"]
+
+        """
+        new = self.__class__(path=self.path, cast=self.cast, default=self.default)
+        new.keys = self.keys + [item]
+        return new
 
     def validate_allowance_to_access_secrets(self):
         # type: () -> None

@@ -6,6 +6,11 @@ Changelog
 `Unreleased`_
 -------------
 
+Fixed
+~~~~~
+
+- Modification of vault variables in ``[]`` access. `#51`_
+
 `0.7.1`_ - 2019-07-17
 ---------------------
 
@@ -37,6 +42,7 @@ Added
 .. _0.7.0: https://github.com/kiwicom/konfetti/compare/0.6.0...0.7.0
 .. _0.7.1: https://github.com/kiwicom/konfetti/compare/0.7.0...0.7.1
 
+.. _#51: https://github.com/kiwicom/konfetti/issues/51
 .. _#47: https://github.com/kiwicom/konfetti/issues/47
 .. _#35: https://github.com/kiwicom/konfetti/issues/35
 .. _#34: https://github.com/kiwicom/konfetti/issues/34

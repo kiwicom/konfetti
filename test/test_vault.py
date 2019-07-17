@@ -8,8 +8,7 @@ import pytest
 from requests import RequestException
 from tenacity import retry_if_exception_type, Retrying, stop_after_attempt
 
-import konfetti
-from konfetti import Konfig
+from konfetti import Konfig, vault
 from konfetti.exceptions import (
     InvalidSecretOverrideError,
     KonfettiError,
@@ -117,7 +116,7 @@ def test_path_not_string():
     else:
         message = "'path' must be <class 'str'>"
     with pytest.raises(TypeError, match=message):
-        konfetti.vault(1)
+        vault(1)
 
 
 @pytest.mark.parametrize(
@@ -308,3 +307,21 @@ def test_userpass_token_cache(config, monkeypatch, mocker):
     assert config.IS_SECRET is True
     assert auth.called is False
     assert config.vault_backend._token == first_token
+
+
+def test_vault_var_reusage(vault_prefix, vault_addr, vault_token):
+    variable = vault("path/to")
+
+    class Test:
+        VAULT_ADDR = vault_addr
+        VAULT_TOKEN = vault_token
+        SECRET = variable["SECRET"]
+        IS_SECRET = variable["IS_SECRET"]
+
+    config = Konfig.from_object(Test, vault_backend=VaultBackend(vault_prefix))
+    assert config.asdict() == {
+        "SECRET": "value",
+        "IS_SECRET": True,
+        "VAULT_ADDR": vault_addr,
+        "VAULT_TOKEN": vault_token,
+    }
