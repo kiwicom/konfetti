@@ -6,6 +6,10 @@ Changelog
 `Unreleased`_
 -------------
 
+
+`0.7.2`_ - 2019-07-18
+---------------------
+
 Fixed
 ~~~~~
 
@@ -41,6 +45,7 @@ Added
 .. _Unreleased: https://github.com/kiwicom/konfetti/compare/0.7.0...HEAD
 .. _0.7.0: https://github.com/kiwicom/konfetti/compare/0.6.0...0.7.0
 .. _0.7.1: https://github.com/kiwicom/konfetti/compare/0.7.0...0.7.1
+.. _0.7.2: https://github.com/kiwicom/konfetti/compare/0.7.1...0.7.2
 
 .. _#51: https://github.com/kiwicom/konfetti/issues/51
 .. _#47: https://github.com/kiwicom/konfetti/issues/47

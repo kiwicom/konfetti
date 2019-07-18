@@ -22,7 +22,7 @@ with open("test-requirements.in") as f:
 
 setup(
     name="konfetti",
-    version="0.7.1",
+    version="0.7.2",
     url="https://github.com/kiwicom/konfetti",
     license="MIT",
     author="Dmitry Dygalo",
