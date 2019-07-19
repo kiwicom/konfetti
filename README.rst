@@ -8,24 +8,26 @@
 Description
 -----------
 
-``konfetti`` is a Python configuration management system with an intuitive
-API, lazy evaluation and (a)sync Vault support.
+``konfetti`` is a Python configuration management library that simplifies the process of setting up your application to run on your company’s infrastructure.
+
+This library will help you to retrieve secrets from Vault, manages the access to settings required by our monitoring services, such as Datadog and Sentry, and set up tests for evaluating your app's behavior.
+
+Konfetti manages your app's configuration settings through lazy evaluation: It only calls and configures what your app needs and when it needs it.
+
+Key benefits:
+^^^^^^^^^^^^^
+
+**Configurable lazy evaluation** - You can choose the moment when Konfetti will evaluate your the configuration of your app.
+
+**Faster & simpler test runs** - No need for evaluating the configuration of the whole project if it's not used.
+
+**Faster and flexible testing** - Isolating small parts of your application no longer requires you to perform a complete setup for each test.
+
+**Integration with popular Web Application Frameworks** - Konfetti can seamlessly work with Django, Flask, and Celery.
+
 
 The interface design and features are heavily inspired by `decouple`_, `Django`_, `envparse`_ and `dynaconf`_.
 
-**Key features**:
-
--  Lazy evaluation;
--  Built-in environment variables support;
--  Built-in async Vault access support;
--  Helpers for tests;
--  Django & Flask integration.
-
-**Benefits of lazy evaluation**:
-
--  Faster & simpler test runs; No need for evaluation the the whole
-   project config if it is not used
--  Avoid network calls during imports until necessary;
 
 Quickstart
 ----------
