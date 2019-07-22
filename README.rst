@@ -32,13 +32,21 @@ The interface design and features are heavily inspired by `decouple`_, `Django`_
 Quickstart
 ----------
 
-To use ``konfetti`` you need to define:
+Before Konfetti can perform its tasks, you'll need to create a settings module and then tell Konfetti the location of this module.
 
--  configuration variables in a module or a class;
--  an access point;
+1. Creating the Settings Module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Settings module
-^^^^^^^^^^^^^^^
+Please find the application settings, for your production, local, or other environments, using the following path:
+``app_name/settings/production.py``
+
+Next, please review the below code block and copy the relevant parts in your settings file.
+
+
+> :warning: **Variables need to be named with all uppercase letters, other variables will be ignored**
+
+> :warning: **If your app requires Vault access, then you'll need to specify `VAULT_ADDR` and `VAULT_TOKEN` in the settings module**
+
 
 .. code:: python
 
@@ -51,12 +59,14 @@ Settings module
    DEBUG = env("DEBUG", default=False)
    DATABASE_URI = vault("path/to/db")
 
-The naming convention for variables names is upper case, other variables
-will be ignored. To work with Vault it is required to specify
-``VAULT_ADDR`` and ``VAULT_TOKEN`` in the settings module.
+Apart from the import statement ``from konfetti import env, vault``, you can remove the settings for the features that you don't use.
 
-Access point
-^^^^^^^^^^^^
+If, for instance, you don’t use a database, then you can remove the `DATABASE_URI` variable. Depending on your settings, it might also be called `DB_URI`, or similar.
+
+Furthermore, you can remove `VAULT_ADDR` and `VAULT_TOKEN` if your app doesn’t require secrets.
+
+2. Configuring the Access Point
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
@@ -65,18 +75,21 @@ Access point
 
    config = Konfig(vault_backend=AsyncVaultBackend("/secret/team"))
 
-``konfetti`` relies on ``KONFETTI_SETTINGS`` environment variable to
-discover your settings module, in the case above:
+In your app's environment variables, please add the KONFETTI_SETTINGS variable with the path to your settings module.  In the case of the code block above, it would be:
 
 ``export KONFETTI_SETTINGS=app_name.settings.production``
 
-Alternatively the access point could be initiated from an object, importable string, mapping or a JSON file.
+Alternatively the access point could be initiated from an object, importable string, mapping or a JSON file:
+
+**Object**
 
 .. code:: python
 
    class TestSettings:
        VALUE = "secret"
    config = Konfig.from_object(TestSettings, ...)
+
+**Importable string**
 
 .. code:: python
 
@@ -86,9 +99,13 @@ Alternatively the access point could be initiated from an object, importable str
    SECRET = vault("/path/to")["secret"]
    config = Konfig.from_object(__name__, ...)
 
+**Mapping**
+
 .. code:: python
 
    config = Konfig.from_mapping({"SECRET": 42}, ...)
+
+**JSON**
 
 .. code:: python
 
