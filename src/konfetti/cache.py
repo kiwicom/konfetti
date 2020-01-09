@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, cast, Any
 
 import attr
 
@@ -91,6 +91,7 @@ class InMemoryCache(object):
         data = self._data.get(key, EMPTY)
         if data is EMPTY:
             return data
+        data = cast(Dict[str, Any], data)
         if self._delete_if_expired(key, data["inserted"]):
             return EMPTY
         return data["data"]
