@@ -36,6 +36,7 @@ class AsyncVaultBackend(BaseVaultBackend):
 
     async def load(self, path, url, token, username, password):  # pylint: disable=too-many-arguments
         # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Any
+        # pylint: disable=import-outside-toplevel
         from aiohttp import ClientConnectionError
         from tenacity import AsyncRetrying
 
@@ -48,7 +49,7 @@ class AsyncVaultBackend(BaseVaultBackend):
         # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Any
         """A call to the Vault server."""
         vault_logger.debug('Access "%s" in Vault', path)
-        import aiohttp
+        import aiohttp  # pylint: disable=import-outside-toplevel
 
         if not token and (username and password):
             if self._token is not NOT_SET:
@@ -73,7 +74,7 @@ class AsyncVaultBackend(BaseVaultBackend):
 
     async def _read_path(self, path, url, token):
         # type: (str, str, str) -> Any
-        import aiohttp
+        import aiohttp  # pylint: disable=import-outside-toplevel
 
         url = _get_full_url(url, path)
         headers = {"X-Vault-Token": token}
@@ -94,7 +95,7 @@ class AsyncVaultBackend(BaseVaultBackend):
     @staticmethod
     async def _auth_userpass(url, username, password):
         # type: (str, str, str) -> str
-        import aiohttp
+        import aiohttp  # pylint: disable=import-outside-toplevel
 
         params = {"password": password}
         auth_url = _get_full_url(url, "auth/userpass/login/{}".format(username))

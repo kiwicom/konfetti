@@ -29,7 +29,7 @@ class VaultBackend(BaseVaultBackend):
 
     def load(self, path, url, token, username, password):  # pylint: disable=too-many-arguments
         # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Dict[str, Any]
-
+        # pylint: disable=import-outside-toplevel
         from requests.exceptions import RequestException
         from tenacity import Retrying
 
@@ -41,7 +41,7 @@ class VaultBackend(BaseVaultBackend):
     def _call(self, path, url, token, username, password):  # pylint: disable=too-many-arguments
         # type: (str, str, Optional[str], Optional[str], Optional[str]) -> Any
         vault_logger.debug('Access "%s" in Vault', path)
-        import hvac
+        import hvac  # pylint: disable=import-outside-toplevel
 
         vault = hvac.Client(url=url, token=token)
         if not token and (username and password):
