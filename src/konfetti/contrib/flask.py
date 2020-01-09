@@ -28,6 +28,12 @@ class KonfigProxy(object):
     flask_config = attr.ib()
     konfig = attr.ib()
 
+    def get(self, key, default=None):
+        try:
+            return self._get(key)
+        except KeyError:
+            return default
+
     def _get(self, key):
         try:
             return self.kwargs[key]
@@ -39,6 +45,12 @@ class KonfigProxy(object):
 
     def __getitem__(self, item):
         return self._get(item)
+
+    def __setitem__(self, key, value):
+        self.flask_config[key] = value
+
+    def __contains__(self, item):
+        return self.get(item) is not None
 
     def __getattr__(self, item):
         try:

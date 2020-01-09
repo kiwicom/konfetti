@@ -6,6 +6,9 @@ Changelog
 `Unreleased`_
 -------------
 
+Fixed
+~~~~~
+- Change Flask KonfigProxy to behave like Flask config.
 
 `0.7.2`_ - 2019-07-18
 ---------------------

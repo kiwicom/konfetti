@@ -52,3 +52,12 @@ def assert_config(config):
     # Overridden via explicit kwarg
     assert config.SERVER_NAME == "test"
     assert config["SERVER_NAME"] == "test"
+    # Settings flask config item via __setitem__
+    config["CONF_KEY"] = "conf_item"
+    assert config["CONF_KEY"] == "conf_item"
+    # Testing __contains__
+    assert "KEY" in config
+    assert "NOT_EXISTING_KEY" not in config
+    # Testing get method
+    assert config.get("KEY") == "value"
+    assert config.get("NOT_EXISTING_KEY") is None
