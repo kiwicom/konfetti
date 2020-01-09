@@ -54,7 +54,7 @@ class VaultVariable(CastableMixin):
         data = backend.load(self.path, url, token, username, password)
         if iscoroutine(data) or isgenerator(data):
             # To avoid syntax errors on Python 2.7
-            from .._async import make_async_callback
+            from .._async import make_async_callback  # pylint: disable=import-outside-toplevel
 
             return make_async_callback(data, self._extract_value)
         return self._extract_value(data)
@@ -76,7 +76,7 @@ class VaultVariable(CastableMixin):
             value = value[key]
 
         if backend.is_async:
-            from .._async import make_simple_coro
+            from .._async import make_simple_coro  # pylint: disable=import-outside-toplevel
 
             value = make_simple_coro(value)
         return value

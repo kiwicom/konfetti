@@ -66,7 +66,7 @@ class Lazy(object):
         return self.value
 
 
-@attr.s(slots=True)
+@attr.s(slots=True)  # pylint: disable=too-many-instance-attributes
 class Konfig(object):
     """Configuration holder."""
 
@@ -291,7 +291,7 @@ class Konfig(object):
             return value
 
         if self.vault_backend and self.vault_backend.is_async:
-            from ._async import async_process_dict
+            from ._async import async_process_dict  # pylint: disable=import-outside-toplevel
 
             return async_process_dict(obj, evaluate_option)
         return rebuild_dict(obj, evaluate_option)
@@ -414,7 +414,7 @@ class OverrideContextManager:
         To avoid extra dependency on `wrapt` it is specified only for Python 2 dependencies and
         done differently here. Maybe it will be better to just use
         """
-        import wrapt
+        import wrapt  # pylint: disable=import-outside-toplevel
 
         @wrapt.decorator
         def wrapper(func, instance, args, kwargs):
@@ -435,6 +435,6 @@ class OverrideContextManager:
     def wrap_coro(self, coro):
         # type: (Callable) -> Callable
         """Apply config override to async test functions."""
-        from ._async import wrap_coro
+        from ._async import wrap_coro  # pylint: disable=import-outside-toplevel
 
         return wrap_coro(self, coro)

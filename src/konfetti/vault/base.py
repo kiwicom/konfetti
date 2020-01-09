@@ -6,7 +6,7 @@ from ..cache import check_ttl, EMPTY, InMemoryCache
 from ..utils import NOT_SET
 
 
-@attr.s(slots=True)
+@attr.s(slots=True)  # pylint: disable=too-many-instance-attributes
 class BaseVaultBackend(object):
     prefix = attr.ib(type=Union[str, object], default=NOT_SET)
     cache_ttl = attr.ib(type=Optional[Union[int, float]], validator=check_ttl, default=None)
@@ -50,6 +50,7 @@ class BaseVaultBackend(object):
     def _get_retry(self, cls, exception):
         retry = self.retry
         if not retry:
+            # pylint: disable=import-outside-toplevel
             from tenacity import retry_if_exception_type, stop_after_attempt, stop_after_delay
 
             retry = cls(
