@@ -1,4 +1,4 @@
-from typing import Optional, Union  # ignore: PyUnusedCodeBear
+from typing import Optional, Union, cast  # ignore: PyUnusedCodeBear
 
 import attr
 
@@ -40,12 +40,14 @@ class BaseVaultBackend(object):
 
     def _get_from_cache(self, path):
         if self.cache is not NOT_SET:
-            return self.cache.get(path)
+            cache = cast(InMemoryCache, self.cache)
+            return cache.get(path)
         return EMPTY
 
     def _set_to_cache(self, path, value):
         if self.cache is not NOT_SET:
-            self.cache.set(path, value)
+            cache = cast(InMemoryCache, self.cache)
+            cache.set(path, value)
 
     def _get_retry(self, cls, exception):
         retry = self.retry

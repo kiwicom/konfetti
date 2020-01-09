@@ -11,7 +11,7 @@ from .utils import NOT_SET
 @attr.s(slots=True)
 class LazyVariable(DefaultMixin, CastableMixin):
     name = attr.ib(default=NOT_SET)
-    func = attr.ib(default=NOT_SET)
+    func = attr.ib(default=NOT_SET, type=Callable)
     default = attr.ib(default=NOT_SET)
     cast = attr.ib(default=NOT_SET, validator=validate_cast)
 
@@ -38,7 +38,8 @@ class LazyVariable(DefaultMixin, CastableMixin):
         self.func = func
         name = func.__module__.rsplit(".", 1)[1]
         module = __import__(func.__module__, fromlist=[name])
-        setattr(module, self.name, self)
+        # NOTE. It is better to prevent usage of `lazy` without a passed name
+        setattr(module, self.name, self)  # type: ignore
         return self
 
     def evaluate(self, config):
