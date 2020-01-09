@@ -585,18 +585,18 @@ Flask extension
 There is an extension for ``Flask`` that replaces ``Flask.config`` with ``Konfig`` instance and adds
 all ``konfetti`` features to your ``app.config``.
 
-```python
-from flask import Flask
-from konfetti.contrib.flask import FlaskKonfig
-from .settings import config
+.. code:: python
 
-app = Flask(__name__)
-FlaskKonfig(app, config, CUSTOM_OPTION=42)
+    from flask import Flask
+    from konfetti.contrib.flask import FlaskKonfig
+    from .settings import config
 
-...
+    app = Flask(__name__)
+    FlaskKonfig(app, config, CUSTOM_OPTION=42)
 
-# Taken from Vault
-assert app.config.SECRET == "value"
-# Manually specified
-assert app.config.CUSTOM_OPTION == 42
-```
+    ...
+
+    # Taken from Vault
+    assert app.config.SECRET == "value"
+    # Manually specified
+    assert app.config.CUSTOM_OPTION == 42
