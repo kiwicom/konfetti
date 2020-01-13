@@ -61,7 +61,19 @@ class VaultVariable(CastableMixin):
 
     def _try_load_from_env(self, backend):
         # type: (VaultBackend) -> Any
-        value = EnvVariable(self.override_variable_name, cast=self.cast).evaluate()
+        try:
+            value = self._try_load_dict_from_env()
+        except exceptions.MissingError:
+            value = EnvVariable(self.override_variable_name(add_keys=True), cast=self.cast).evaluate()
+
+        if backend.is_async:
+            from .._async import make_simple_coro  # pylint: disable=import-outside-toplevel
+
+            value = make_simple_coro(value)
+        return value
+
+    def _try_load_dict_from_env(self):
+        value = EnvVariable(self.override_variable_name(), cast=self.cast).evaluate()
         try:
             value = json.loads(value)
         except (ValueError, TypeError):
@@ -69,16 +81,11 @@ class VaultVariable(CastableMixin):
         if not isinstance(value, dict):
             raise exceptions.InvalidSecretOverrideError(
                 "`{}` variable should be a JSON-encoded dictionary, got: `{}`".format(
-                    self.override_variable_name, value
+                    self.override_variable_name(), value
                 )
             )
         for key in self.keys:
             value = value[key]
-
-        if backend.is_async:
-            from .._async import make_simple_coro  # pylint: disable=import-outside-toplevel
-
-            value = make_simple_coro(value)
         return value
 
     def _load_credentials(self, closure):
@@ -141,9 +148,8 @@ class VaultVariable(CastableMixin):
         # Move to some global config or we need to modify in runtime?
         return EnvVariable(SECRETS_DISABLED_VARIABLE, default=False, cast=bool).evaluate()
 
-    @property
-    def override_variable_name(self):
-        # type: () -> str
+    def override_variable_name(self, add_keys=False):
+        # type: (bool) -> str
         """Convert path to a name of environment variable that will be checked for overriding.
 
         If some key in that secret is going to be overridden then its name is concatenated
@@ -152,7 +158,10 @@ class VaultVariable(CastableMixin):
         Example:
             config.vault("path/to") -> "PATH__TO"
         """
-        return self.path.strip("/").replace("/", SEPARATOR).upper()
+        path = self.path.strip("/")
+        if add_keys:
+            path = "/".join([path] + self.keys)
+        return path.replace("/", SEPARATOR).upper()
 
     @property
     def override_example(self):
@@ -168,4 +177,4 @@ class VaultVariable(CastableMixin):
             value = json.dumps(example)
         else:
             value = "{}"
-        return {self.override_variable_name: value}
+        return {self.override_variable_name(): value}

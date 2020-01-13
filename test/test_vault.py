@@ -102,12 +102,19 @@ def test_get_secret_without_vault_credentials(config, monkeypatch, variables):
         config.get_secret("/path/to")
 
 
-@pytest.mark.parametrize("path, keys, expected", (("/path/to/", ["SECRET"], "PATH__TO"), ("path/to", [], "PATH__TO")))
+@pytest.mark.parametrize(
+    "path, keys, expected",
+    (
+        ("/path/to/", ["SECRET"], {"no_keys": "PATH__TO", "keys": "PATH__TO__SECRET"}),
+        ("path/to", [], {"no_keys": "PATH__TO", "keys": "PATH__TO"}),
+    ),
+)
 def test_override_variable_name(path, keys, expected):
     variable = VaultVariable(path)
     for key in keys:
         variable = variable[key]
-    assert variable.override_variable_name == expected
+    assert variable.override_variable_name() == expected["no_keys"]
+    assert variable.override_variable_name(add_keys=True) == expected["keys"]
 
 
 def test_path_not_string():
@@ -141,8 +148,10 @@ def test_override_secret(config, monkeypatch):
 
 def test_override_config_secret(config, monkeypatch):
     monkeypatch.setenv("PATH__TO", '{"SECRET": "bar"}')
+    monkeypatch.setenv("PATH__TO__NESTED__NESTED_SECRET__NESTED", "test")
     assert config.WHOLE_SECRET == {"SECRET": "bar"}
     assert config.SECRET == "bar"
+    assert config.NESTED_SECRET == "test"
 
 
 @pytest.mark.parametrize("data", ("[1, 2]", "[invalid]"))

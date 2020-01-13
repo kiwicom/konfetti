@@ -6,6 +6,10 @@ Changelog
 `Unreleased`_
 -------------
 
+Added
+~~~~~
+- Add keys to environment variable name before search in Vault.
+
 Fixed
 ~~~~~
 - Change Flask KonfigProxy to behave like Flask config.
