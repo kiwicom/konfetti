@@ -6,6 +6,9 @@ Changelog
 `Unreleased`_
 -------------
 
+`0.8.0`_ - 2020-01-15
+---------------------
+
 Added
 ~~~~~
 - Add keys to environment variable name before search in Vault.
