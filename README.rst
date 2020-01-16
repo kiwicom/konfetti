@@ -28,6 +28,14 @@ Key benefits:
 
 The interface design and features are heavily inspired by `decouple`_, `Django`_, `envparse`_ and `dynaconf`_.
 
+Installation
+------------
+
+To install konfetti via ``pip`` run the following command:
+
+.. code:: bash
+
+    pip install konfetti
 
 Quickstart
 ----------
