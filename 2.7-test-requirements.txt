@@ -12,7 +12,7 @@ configparser==3.7.4       # via importlib-metadata
 contextlib2==0.5.5        # via importlib-metadata
 click==7.0                # via flask
 coverage==4.3.4
-django==1.11.27
+django==1.11.28
 flask==1.0.3
 freezegun==0.3.12         # via pytest-freezegun
 funcsigs==1.0.2           # via mock, pytest
