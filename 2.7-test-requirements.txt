@@ -40,7 +40,7 @@ scandir==1.10.0           # via pathlib2
 six==1.12.0               # via freezegun, mock, more-itertools, packaging, pathlib2, pytest, python-dateutil, tenacity
 tenacity==5.0.4
 typing==3.7.4 ; python_version < "3.5"
-urllib3==1.25.3           # via requests
+urllib3==1.25.8           # via requests
 wcwidth==0.1.7            # via pytest
 werkzeug==0.15.4          # via flask
 zipp==0.5.1               # via importlib-metadata
